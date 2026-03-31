@@ -1,0 +1,113 @@
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:'Segoe UI', sans-serif;
+}
+
+body{
+  height:100vh;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+.background{
+  position:fixed;
+  width:100%;
+  height:100%;
+  background:url("https://images.unsplash.com/photo-1521305916504-4a1121188589");
+  background-size:cover;
+  background-position:center;
+  filter:blur(6px);
+  z-index:-1;
+}
+
+.login-card{
+  width:360px;
+  background:rgba(255,255,255,0.92);
+  border-radius:20px;
+  padding:30px;
+  box-shadow:0 20px 40px rgba(0,0,0,0.3);
+}
+
+.logo{
+  width:70px;
+  height:70px;
+  background:#0f9d58;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:0 auto 15px;
+  color:white;
+  font-size:28px;
+}
+
+h1{
+  text-align:center;
+  color:#1f2933;
+}
+
+.subtitle{
+  text-align:center;
+  color:#6b7280;
+  margin-bottom:20px;
+}
+
+label{
+  font-size:14px;
+  color:#374151;
+}
+
+.input-box{
+  display:flex;
+  align-items:center;
+  background:#f3f4f6;
+  padding:12px;
+  border-radius:10px;
+  margin:8px 0 16px;
+}
+
+.input-box i{
+  color:#9ca3af;
+  margin-right:10px;
+}
+
+.input-box input{
+  border:none;
+  outline:none;
+  background:transparent;
+  width:100%;
+}
+
+.login-btn{
+  width:100%;
+  padding:12px;
+  background:#0f9d58;
+  color:white;
+  border:none;
+  border-radius:12px;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.login-btn:hover{
+  background:#0b7d45;
+}
+
+.demo-box{
+  background:#f3f4f6;
+  border-radius:12px;
+  padding:15px;
+  margin-top:20px;
+  font-size:14px;
+}
+
+.footer{
+  position:fixed;
+  bottom:15px;
+  color:white;
+  font-size:14px;
+  opacity:0.9;
+}

@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Dashboard</title>
+<link rel="stylesheet" href="dashboard.css">
+</head>
+
+<body>
+  
+<div class="background"></div>
+
+<div id="navbar-container"></div>
+<script>
+    fetch("navbar.html")
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("navbar-container").innerHTML = data;
+        });
+</script>
+
+<div class="page-container">
+    <div class="cards">
+      <div class="card">
+        <h3 style="color: #666; font-size: 16px;">Total Orders (Today)</h3>
+        <p id="dashOrders" style="color: #2563eb; font-size: 28px;">Loading...</p>
+      </div>
+      <div class="card">
+        <h3 style="color: #666; font-size: 16px;">Today's Sales</h3>
+        <p id="dashSales" style="color: #16a34a; font-size: 28px;">Loading...</p>
+      </div>
+      <div class="card">
+        <h3 style="color: #666; font-size: 16px;">Total Menu Items</h3>
+        <p id="dashItems" style="color: #f59e0b; font-size: 28px;">Loading...</p>
+      </div>
+    </div>
+</div>
+
+<script>
+function logout(){
+  window.location.href = "index.html";
+}
+
+// Fetch live data from your backend!
+async function loadLiveStats() {
+    try {
+        // 1. Fetch Sales & Orders
+        let salesRes = await fetch("http://localhost:8000/api/sales");
+        let salesData = await salesRes.json();
+        
+        if (salesData.status === 1) {
+            document.getElementById("dashOrders").innerText = salesData.data.dailyOrders;
+            document.getElementById("dashSales").innerText = "₹" + salesData.data.dailySales.toLocaleString('en-IN');
+        }
+
+        // 2. Fetch Menu Items count
+        let itemsRes = await fetch("http://localhost:8000/api/item-list");
+        let itemsData = await itemsRes.json();
+        
+        if (itemsData.status === 1) {
+            document.getElementById("dashItems").innerText = itemsData.data.length;
+        }
+
+    } catch (err) {
+        console.error("Failed to load dashboard stats", err);
+        document.getElementById("dashOrders").innerText = "Error";
+        document.getElementById("dashSales").innerText = "Error";
+        document.getElementById("dashItems").innerText = "Error";
+    }
+}
+
+// Run the function when the page loads
+loadLiveStats();
+</script>
+
+</body>
+</html>

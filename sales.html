@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sales Dashboard</title>
+  
+  <script>
+    (function() {
+        const isLoggedIn = sessionStorage.getItem("isAdminLoggedIn");
+        const role = sessionStorage.getItem("userRole");
+
+        // If not logged in, go to login page
+        if (isLoggedIn !== "true") {
+            window.location.href = "login.html";
+        } 
+        // If logged in but NOT as manager, kick them out
+        else if (role !== "manager") {
+            alert("⛔ Access Denied: Only the Manager can view Sales Analytics.");
+            window.location.href = "dashboard.html";
+        }
+    })();
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* Your original CSS remains 100% untouched */
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f6f9;
+    }
+
+    .content-wrapper {
+      padding: 24px;
+      max-width: 1400px;
+      margin: 0 auto;
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      font-size: 28px;
+      font-weight: bold;
+      color: #111;
+    }
+
+    .header p {
+      font-size: 14px;
+      color: #666;
+      margin-top: 4px;
+    }
+
+    .date-badge {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: white;
+      padding: 10px 16px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      font-size: 14px;
+      color: #333;
+      font-weight: 500;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .card {
+      background: white;
+      padding: 20px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .card-icon {
+      width: 48px;
+      height: 48px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 22px;
+    }
+
+    .card-icon.blue { background: #eff6ff; }
+    .card-icon.green { background: #f0fdf4; }
+    .card-icon.purple { background: #faf5ff; }
+
+    .card-info h3 {
+      font-size: 13px;
+      color: #666;
+      font-weight: normal;
+      margin-bottom: 4px;
+    }
+
+    .card-info h2 {
+      font-size: 26px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .card-info h2.blue { color: #2563eb; }
+    .card-info h2.green { color: #16a34a; }
+    .card-info h2.purple { color: #7c3aed; }
+
+    .card-trend {
+      font-size: 12px;
+      color: #16a34a;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .charts-row {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+      margin-bottom: 24px;
+    }
+
+    .chart-card {
+      background: white;
+      padding: 20px 24px;
+      border-radius: 12px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+    }
+
+    .chart-card h3 {
+      font-size: 16px;
+      font-weight: bold;
+      color: #111;
+      margin-bottom: 4px;
+    }
+
+    .chart-card p {
+      font-size: 12px;
+      color: #888;
+      margin-bottom: 16px;
+    }
+
+    .chart-card.full {
+      grid-column: 1 / -1;
+    }
+
+    .charts-bottom {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .cards, .charts-row, .charts-bottom {
+        grid-template-columns: 1fr;
+      }
+      .chart-card.full {
+        grid-column: 1;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="navbar-container"></div>
+<script>
+    fetch("navbar.html")
+        .then(response => response.text())
+        .then(data => {
+            document.getElementById("navbar-container").innerHTML = data;
+        });
+</script>
+
+<div class="content-wrapper">
+  <div class="header">
+    <div>
+      <h1>Sales Dashboard</h1>
+      <p>Overview of your sales performance</p>
+    </div>
+    <div class="date-badge">
+      📅 <span id="currentDate">Loading...</span>
+    </div>
+  </div>
+
+  <div class="cards">
+    <div class="card">
+      <div class="card-icon blue">₹</div>
+      <div class="card-info">
+        <h3>Daily Sales</h3>
+        <h2 class="blue" id="dailySales">₹0</h2>
+        <div class="card-trend">↑ <span id="dailyTrend">0</span> from yesterday</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon green">📅</div>
+      <div class="card-info">
+        <h3>Monthly Sales</h3>
+        <h2 class="green" id="monthlySales">₹0</h2>
+        <div class="card-trend">↑ <span id="monthlyTrend">0</span> from last month</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-icon purple">🛍️</div>
+      <div class="card-info">
+        <h3>Orders Today</h3>
+        <h2 class="purple" id="dailyOrders">0</h2>
+        <div class="card-trend">↑ <span id="orderTrend">0</span> orders from yesterday</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="charts-row">
+    <div class="chart-card">
+      <h3>Daily Sales</h3>
+      <p>This week's daily sales performance</p>
+      <canvas id="dailyChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Monthly Sales</h3>
+      <p>Last 6 months overview</p>
+      <canvas id="monthlyChart"></canvas>
+    </div>
+  </div>
+
+  <div class="charts-bottom">
+    <div class="chart-card">
+      <h3>Category-wise Sales</h3>
+      <p>Sales breakdown by product category</p>
+      <canvas id="categoryChart"></canvas>
+    </div>
+
+    <div class="chart-card">
+      <h3>Payment Method</h3>
+      <p>Cash vs UPI breakdown</p>
+      <canvas id="paymentChart"></canvas>
+    </div>
+  </div>
+</div>
+
+<script>
+const API_URL = "http://localhost:8000/api/sales";
+
+// Set current date
+const now = new Date();
+document.getElementById("currentDate").innerText = now.toLocaleDateString('en-IN', {
+  weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+});
+
+let dailyChartInstance = null;
+let monthlyChartInstance = null;
+let categoryChartInstance = null;
+let paymentChartInstance = null;
+
+async function fetchSales() {
+  try {
+    const response = await fetch(API_URL);
+    if (!response.ok) throw new Error("Server error: " + response.status);
+
+    const result = await response.json();
+
+    if (result.status === 1) {
+      updateCards(result.data);
+      updateCharts(result.data);
+    }
+
+  } catch (err) {
+    console.error("Failed to fetch sales:", err);
+  }
+}
+
+// Added logout logic so it works globally
+function logout() {
+    sessionStorage.clear();
+    window.location.href = "login.html";
+}
+
+function updateCards(data) {
+  document.getElementById("dailySales").innerText = "₹" + data.dailySales.toLocaleString('en-IN');
+  document.getElementById("monthlySales").innerText = "₹" + data.monthlySales.toLocaleString('en-IN');
+  document.getElementById("dailyOrders").innerText = data.dailyOrders;
+  document.getElementById("dailyTrend").innerText = "₹" + data.dailySales.toLocaleString('en-IN');
+  document.getElementById("monthlyTrend").innerText = "₹" + data.monthlySales.toLocaleString('en-IN');
+  document.getElementById("orderTrend").innerText = data.dailyOrders;
+}
+
+function updateCharts(data) {
+  if (dailyChartInstance) dailyChartInstance.destroy();
+  if (monthlyChartInstance) monthlyChartInstance.destroy();
+  if (categoryChartInstance) categoryChartInstance.destroy();
+  if (paymentChartInstance) paymentChartInstance.destroy();
+
+  // Daily Sales Chart
+  dailyChartInstance = new Chart(document.getElementById("dailyChart"), {
+    type: 'bar',
+    data: {
+      labels: data.dailyChart.labels,
+      datasets: [{
+        label: "Sales (₹)",
+        data: data.dailyChart.data,
+        backgroundColor: "#6096f5",
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          ticks: {
+            callback: val => "₹" + (val >= 1000 ? (val/1000).toFixed(1) + "k" : val)
+          },
+          grid: { color: "#f0f0f0" }
+        },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Monthly Sales Chart
+  monthlyChartInstance = new Chart(document.getElementById("monthlyChart"), {
+    type: 'bar',
+    data: {
+      labels: data.monthlyChart.labels,
+      datasets: [{
+        label: "Sales (₹)",
+        data: data.monthlyChart.data,
+        backgroundColor: "#22a861",
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        y: {
+          ticks: {
+            callback: val => "₹" + (val >= 1000 ? (val/1000).toFixed(1) + "k" : val)
+          },
+          grid: { color: "#f0f0f0" }
+        },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Category Chart
+  categoryChartInstance = new Chart(document.getElementById("categoryChart"), {
+    type: 'bar',
+    data: {
+      labels: data.categoryChart.labels,
+      datasets: [{
+        label: "Sales (₹)",
+        data: data.categoryChart.data,
+        backgroundColor: "#f59e0b",
+        borderRadius: 6,
+        borderSkipped: false
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          callbacks: {
+            label: ctx => "₹" + ctx.raw.toLocaleString('en-IN')
+          }
+        }
+      },
+      scales: {
+        y: {
+          ticks: {
+            callback: val => "₹" + (val >= 1000 ? (val/1000).toFixed(1) + "k" : val)
+          },
+          grid: { color: "#f0f0f0" }
+        },
+        x: { grid: { display: false } }
+      }
+    }
+  });
+
+  // Payment Chart
+  paymentChartInstance = new Chart(document.getElementById("paymentChart"), {
+    type: 'doughnut',
+    data: {
+      labels: data.paymentChart.labels,
+      datasets: [{
+        data: data.paymentChart.data,
+        backgroundColor: ["#10b981", "#8b5cf6"],
+        borderWidth: 0
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: "bottom" },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.label + ": ₹" + ctx.raw.toLocaleString('en-IN')
+          }
+        }
+      }
+    }
+  });
+}
+
+fetchSales();
+setInterval(fetchSales, 30000); 
+</script>
+
+</body>
+</html>

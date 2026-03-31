@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            margin: 0;
+        }
+
+        .navbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background-color: #0f172a;
+            padding: 10px 20px;
+            font-family: Arial, sans-serif;
+            position: relative;
+            z-index: 1000;
+        }
+
+        .navbar-left {
+            display: flex;
+            align-items: center;
+            gap: 25px;
+        }
+
+        .navbar-left strong {
+            color: white;
+            font-size: 18px;
+        }
+
+        .navbar-left a {
+            color: #d1d5db;
+            text-decoration: none;
+            font-size: 15px;
+            transition: color 0.3s;
+        }
+
+        .navbar-left a:hover {
+            color: white;
+        }
+
+        .logout-btn {
+            background-color: #ef4444;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            color: white;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .logout-btn:hover {
+            background-color: #dc2626;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="navbar">
+        <div class="navbar-left">
+            <strong>Admin Panel</strong>
+            <a href="dashboard.html">Dashboard</a>
+            <a href="menu.html">Menu</a>
+            <a href="inventory.html">Inventory</a>
+            <a href="sales.html">Sales</a>
+            <a href="billing.html">Billing</a>
+        </div>
+
+        <button class="logout-btn" onclick="alert('Logged out successfully!'); window.location.href='login.html';">
+            Logout
+        </button>
+    </div>
+</body>
+</html>

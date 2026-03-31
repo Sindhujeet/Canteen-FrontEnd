@@ -1,0 +1,170 @@
+/* Reset */
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+/* Background */
+
+body{
+background: linear-gradient(135deg,#1e3c72,#2a5298);
+min-height:100vh;
+color:#333;
+}
+
+/* Navbar */
+
+.navbar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+background:#0f172a;
+padding:15px 40px;
+display:flex;
+align-items:center;
+gap:25px;
+box-shadow:0 4px 10px rgba(0,0,0,0.3);
+z-index:1000;
+}
+
+.navbar .logo{
+font-size:20px;
+font-weight:bold;
+color:white;
+margin-right:20px;
+}
+
+.navbar a{
+text-decoration:none;
+color:#cbd5f5;
+font-size:15px;
+transition:0.3s;
+}
+
+.navbar a:hover{
+color:white;
+}
+
+/* Container */
+
+.container{
+max-width:700px;
+margin:120px auto;
+padding:20px;
+}
+
+/* Title */
+
+h2{
+text-align:center;
+color:white;
+margin-bottom:30px;
+font-size:28px;
+letter-spacing:1px;
+}
+body{
+font-family: Arial;
+background: linear-gradient(120deg,#0f2027,#203a43,#2c5364);
+margin:0;
+padding:0;
+color:white;
+}
+
+.container{
+width:70%;
+margin:auto;
+margin-top:80px;
+background:rgba(255,255,255,0.1);
+padding:30px;
+border-radius:10px;
+backdrop-filter:blur(10px);
+}
+
+h2{
+text-align:center;
+margin-bottom:25px;
+}
+
+.form-section{
+display:flex;
+gap:10px;
+justify-content:center;
+margin-bottom:20px;
+}
+
+input,select{
+padding:8px;
+border-radius:5px;
+border:none;
+}
+
+button{
+padding:8px 15px;
+border:none;
+background:#3498db;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+button:hover{
+background:#2980b9;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+background:rgba(0,0,0,0.3);
+}
+
+th,td{
+padding:12px;
+text-align:center;
+}
+
+th{
+background:#1f2c3a;
+}
+
+tr:nth-child(even){
+background:rgba(255,255,255,0.05);
+}
+
+.edit-btn{
+background:#27ae60;
+}
+
+.delete-btn{
+background:#e74c3c;
+}
+
+.status{
+color:#2ecc71;
+font-weight:bold;
+}
+.qty-btn{
+padding:4px 10px;
+margin:0 5px;
+border:none;
+background:#3498db;
+color:white;
+border-radius:5px;
+cursor:pointer;
+}
+
+.qty-btn:hover{
+background:#2980b9;
+}
+
+.qty{
+font-weight:bold;
+margin:0 8px;
+}
+.status{
+font-weight:bold;
+color:#2ecc71;
+}

@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inventory Management</title>
+    <link rel="stylesheet" href="inventory.css">
+</head>
+
+<body>
+
+    <div id="navbar-container"></div>
+    <script>
+        fetch("navbar.html")
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById("navbar-container").innerHTML = data;
+            });
+    </script>
+
+    <div class="container">
+        <h2>Inventory Management</h2>
+
+        <div class="form-section">
+            <input type="text" id="itemName" placeholder="Item name">
+            <input type="number" id="quantity" placeholder="Quantity">
+            <select id="unit">
+                <option value="">Unit</option>
+                <option value="Kg">Kg</option>
+                <option value="Litre">Litre</option>
+                <option value="Pkts">Pkts</option>
+                <option value="Pcs">Pcs</option>
+            </select>
+            <button onclick="addItem()">Add Item</button>
+        </div>
+
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>Item</th>
+                    <th>Quantity</th>
+                    <th>Unit</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                </tbody>
+        </table>
+    </div>
+
+    <script>
+        let inventory = JSON.parse(localStorage.getItem("canteen_inventory")) || [];
+
+        function renderInventory() {
+            const tbody = document.querySelector("#inventoryTable tbody");
+            tbody.innerHTML = "";
+
+            inventory.forEach((item, index) => {
+                let status = "In Stock";
+                let statusColor = "#2ecc71"; // Your green
+                
+                if (item.qty <= 5 && item.qty > 0) {
+                    status = "Low Stock";
+                    statusColor = "#f39c12"; // Orange
+                } else if (item.qty <= 0) {
+                    status = "Out of Stock";
+                    statusColor = "#e74c3c"; // Your red
+                }
+
+                // Injecting your exact CSS classes
+                tbody.innerHTML += `
+                    <tr>
+                        <td>${item.name}</td>
+                        <td>
+                            <button class="qty-btn" onclick="updateQty(${index}, -1)">-</button>
+                            <span class="qty">${item.qty}</span>
+                            <button class="qty-btn" onclick="updateQty(${index}, 1)">+</button>
+                        </td>
+                        <td>${item.unit}</td>
+                        <td class="status" style="color: ${statusColor};">${status}</td>
+                        <td>
+                            <button class="delete-btn" onclick="deleteItem(${index})">Delete</button>
+                        </td>
+                    </tr>
+                `;
+            });
+        }
+
+        function addItem() {
+            let nameInput = document.getElementById("itemName").value.trim();
+            let qtyInput = Number(document.getElementById("quantity").value);
+            let unitInput = document.getElementById("unit").value;
+
+            if (!nameInput || qtyInput < 0 || !unitInput) {
+                alert("Please fill out all fields correctly!");
+                return;
+            }
+
+            inventory.push({ name: nameInput, qty: qtyInput, unit: unitInput });
+            localStorage.setItem("canteen_inventory", JSON.stringify(inventory));
+
+            document.getElementById("itemName").value = "";
+            document.getElementById("quantity").value = "";
+            document.getElementById("unit").value = "";
+
+            renderInventory();
+        }
+
+        // New function to handle the + and - buttons!
+        function updateQty(index, change) {
+            inventory[index].qty += change;
+            if (inventory[index].qty < 0) inventory[index].qty = 0; // Prevent negative stock
+            localStorage.setItem("canteen_inventory", JSON.stringify(inventory));
+            renderInventory();
+        }
+
+        function deleteItem(index) {
+            if (confirm("Remove this item?")) {
+                inventory.splice(index, 1);
+                localStorage.setItem("canteen_inventory", JSON.stringify(inventory));
+                renderInventory();
+            }
+        }
+
+        // Run this when the page loads
+        renderInventory();
+    </script>
+
+</body>
+</html>

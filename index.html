@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Menu</title>
+
+<style>
+body {
+    margin: 0;
+    font-family: Arial;
+    background: rgb(6, 219, 165);
+}
+.container {
+    width: 95%;
+    margin: auto;
+    padding: 30px;
+}
+.admin-panel {
+    background: rgb(121, 130, 214);
+    padding: 20px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+}
+input, select {
+    padding: 8px;
+    margin: 5px;
+}
+button {
+    padding: 8px 15px;
+    margin: 5px;
+    cursor: pointer;
+}
+.menu-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 15px;
+}
+.card {
+    background: #b5cb0d;
+    padding: 10px;
+    border-radius: 10px;
+}
+.card img {
+    width: 100%;
+    height: 140px;
+    object-fit: cover;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="admin-panel">
+<h2>Admin Panel</h2>
+
+<input id="name" placeholder="Item name">
+<input id="desc" placeholder="Description">
+<input id="price" type="number" placeholder="Price">
+<input id="quantity" type="number" placeholder="Quantity">
+
+<br>
+
+<input id="imageUrl" placeholder="Image URL">
+<input type="file" id="imageFile">
+
+<br>
+
+<input id="newCategory" placeholder="New Category">
+<button onclick="addCategory()">Add Category</button>
+
+<br><br>
+
+<select id="category"></select>
+
+<br><br>
+
+<button onclick="addItem()">Add / Update</button>
+
+</div>
+
+<div class="menu-grid" id="menuContainer"></div>
+
+</div>
+
+<script>
+
+const API_URL = "http://localhost:8000";
+let menu = [];
+let editId = null;
+
+// FETCH MENU
+async function fetchMenu() {
+    const res = await fetch(`${API_URL}/api/item-list`);
+    const data = await res.json();
+    menu = data.data;
+
+    loadCategories();
+    displayMenu(menu);
+}
+
+// LOAD CATEGORIES
+function loadCategories() {
+    let select = document.getElementById("category");
+    select.innerHTML = "";
+
+    let categories = [...new Set(menu.map(item => item.category).filter(c => c))];
+
+    categories.forEach(cat => {
+        let option = document.createElement("option");
+        option.value = cat;
+        option.textContent = cat;
+        select.appendChild(option);
+    });
+}
+
+// ADD CATEGORY
+function addCategory() {
+    let newCat = document.getElementById("newCategory").value.trim();
+    if (!newCat) return;
+
+    let select = document.getElementById("category");
+
+    let exists = [...select.options].some(o => o.value === newCat);
+    if (exists) {
+        alert("Category already exists");
+        return;
+    }
+
+    let option = document.createElement("option");
+    option.value = newCat;
+    option.textContent = newCat;
+
+    select.appendChild(option);
+    select.value = newCat;
+
+    document.getElementById("newCategory").value = "";
+}
+
+// DISPLAY MENU
+function displayMenu(items) {
+    let div = document.getElementById("menuContainer");
+    div.innerHTML = "";
+
+    items.forEach(item => {
+
+        let stockText = "";
+        let stockColor = "green";
+
+        if (item.quantity === 0) {
+            stockText = "Out of Stock";
+            stockColor = "red";
+        } else if (item.quantity <= 5) {
+            stockText = `Low Stock (${item.quantity})`;
+            stockColor = "orange";
+        } else {
+            stockText = `In Stock (${item.quantity})`;
+        }
+
+        div.innerHTML += `
+        <div class="card">
+            <img src="${item.image || ''}">
+            <h3>${item.name}</h3>
+            <p>${item.description || ""}</p>
+            <p>₹${item.price}</p>
+
+            <p style="color:${stockColor}; font-weight:bold;">
+                ${stockText}
+            </p>
+
+            <p>Category: ${item.category || "—"}</p>
+
+            <label>
+                <input type="checkbox"
+                ${item.available ? "checked" : ""}
+                ${item.quantity === 0 ? "disabled" : ""}
+                onchange="toggleItem('${item._id}', this.checked)">
+                Available
+            </label>
+
+            <br><br>
+
+            <button onclick="editItem('${item._id}')">Edit</button>
+            <button onclick="deleteItem('${item._id}')">Delete</button>
+        </div>`;
+    });
+}
+
+// TOGGLE AVAILABILITY
+async function toggleItem(id, available) {
+    let item = menu.find(m => m._id === id);
+
+    if (item.quantity === 0 && available === true) {
+        alert("Cannot enable item with 0 stock");
+        fetchMenu();
+        return;
+    }
+
+    await fetch(`${API_URL}/api/item-update/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ available })
+    });
+
+    fetchMenu();
+}
+
+// ADD / UPDATE ITEM
+function addItem() {
+    let name = document.getElementById("name").value;
+    let desc = document.getElementById("desc").value;
+    let price = document.getElementById("price").value;
+    let quantity = document.getElementById("quantity").value;
+    let category = document.getElementById("category").value;
+    let imageUrl = document.getElementById("imageUrl").value;
+    let file = document.getElementById("imageFile").files[0];
+
+    if (!name || !price) {
+        alert("Name and price required");
+        return;
+    }
+
+    if (file) {
+        let reader = new FileReader();
+        reader.onload = function(e) {
+            saveItem(e.target.result, name, desc, price, quantity, category);
+        };
+        reader.readAsDataURL(file);
+    } else {
+        saveItem(imageUrl, name, desc, price, quantity, category);
+    }
+}
+
+// SAVE ITEM
+async function saveItem(image, name, desc, price, quantity, category) {
+
+    let payload = {
+        name,
+        description: desc,
+        price: Number(price),
+        quantity: Number(quantity),
+        image,
+        category,
+        available: Number(quantity) > 0
+    };
+
+    if (editId) {
+        await fetch(`${API_URL}/api/item-update/${editId}`, {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+        editId = null;
+    } else {
+        await fetch(`${API_URL}/api/item-insert`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(payload)
+        });
+    }
+
+    resetForm();
+    fetchMenu();
+}
+
+// EDIT ITEM
+function editItem(id) {
+    let item = menu.find(m => m._id === id);
+
+    document.getElementById("name").value = item.name;
+    document.getElementById("desc").value = item.description;
+    document.getElementById("price").value = item.price;
+    document.getElementById("quantity").value = item.quantity;
+    document.getElementById("category").value = item.category;
+    document.getElementById("imageUrl").value = item.image;
+
+    editId = id;
+}
+
+// DELETE ITEM
+async function deleteItem(id) {
+    await fetch(`${API_URL}/api/item-delete/${id}`, {
+        method: "DELETE"
+    });
+    fetchMenu();
+}
+
+// RESET FORM
+function resetForm() {
+    document.getElementById("name").value = "";
+    document.getElementById("desc").value = "";
+    document.getElementById("price").value = "";
+    document.getElementById("quantity").value = "";
+    document.getElementById("imageUrl").value = "";
+    document.getElementById("newCategory").value = "";
+}
+
+// INIT
+fetchMenu();
+
+</script>
+
+</body>
+</html>
