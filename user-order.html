@@ -1,227 +1,163 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Canteen QR Order</title>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<title>GUS Canteen | Quick Order</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-/* --- Original CSS --- */
-/* --- Base Layout & Background --- */
+/* ========================================= */
+/* --- 1. MODERN APP LAYOUT (Menu & Cart) -- */
+/* ========================================= */
+:root {
+    --primary: #ff4757; 
+    --primary-hover: #ff6b81;
+    --bg-color: #f8fafc; 
+    --card-bg: #ffffff;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --cart-width: 340px;
+}
+
 body {
-    background-image: url("background.jpg");
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: var(--bg-color);
+    /* Uncomment below if you want your Background.jpeg back! */
+    /* background-image: url("Background.jpeg"); */
+    /* background-size: cover; */
+    /* background-position: center; */
+    /* background-attachment: fixed; */
+    
     min-height: 100vh;
     margin: 0;
-    margin-right: 320px; /* Leaves space for the desktop cart sidebar */
-    font-family: Arial, sans-serif;
+    margin-right: var(--cart-width); 
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-main);
 }
 
-/* --- Header --- */
 .header {
-    background: linear-gradient(135deg, #111827, #e11d48);
-    color: white;
-    padding: 18px;
-    text-align: center;
-    font-size: 22px;
-    font-weight: bold;
+    background: var(--card-bg);
+    padding: 20px 30px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
 }
 
-/* --- Containers & Grids --- */
-.container {
-    width: 95%;
-    max-width: 1200px;
-    margin: auto;
-    padding: 20px;
-}
+.header h2 { margin: 0; font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
 
-.category-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-    gap: 20px;
-}
+.container { width: 92%; max-width: 1200px; margin: 30px auto; }
+
+/* Category Filter Bar */
+.category-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; }
 
 .category-card {
-    background: white;
-    padding: 35px;
-    text-align: center;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    font-size: 18px;
-    font-weight: bold;
-    cursor: pointer;
-    transition: 0.3s;
+    background: white; padding: 10px 24px; border-radius: 30px; 
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04); font-size: 15px;
+    font-weight: 600; color: var(--text-muted); cursor: pointer;
+    border: 2px solid transparent; transition: all 0.2s;
 }
 
-.category-card:hover {
-    background: #e11d48;
-    color: white;
-    transform: translateY(-4px);
-}
+.category-card:hover { color: var(--primary); transform: translateY(-2px); }
+.category-card.active-cat { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2); }
 
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 20px;
-    margin-top: 20px;
-}
+/* Food Menu */
+.menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
 
-/* --- Food Cards --- */
 .food-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-    overflow: hidden;
-    cursor: pointer;
+    background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    overflow: hidden; transition: transform 0.2s; display: flex; flex-direction: column;
 }
 
-.food-card img {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-}
+.food-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
+.food-card img { width: 100%; height: 160px; object-fit: cover; background: #f1f2f6; }
 
-.food-body {
-    padding: 15px;
-}
+.food-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
+.food-body h3 { margin: 0 0 5px 0; font-size: 17px; color: var(--text-main); }
+.food-body .desc { font-size: 13px; color: var(--text-muted); margin: 0 0 15px 0; line-height: 1.4; flex-grow: 1; }
 
-.price {
-    color: #e11d48;
-    font-weight: bold;
-    margin: 8px 0;
-}
+.price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+.price { font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0; }
 
 .add-btn {
-    margin-top: 8px;
-    padding: 7px 14px;
-    border: none;
-    background: #e11d48;
-    color: white;
-    border-radius: 6px;
-    cursor: pointer;
+    padding: 8px 20px; border: none; background: #e8f5e9; color: #2ed573;
+    font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; font-family: 'Poppins', sans-serif;
 }
+.add-btn:hover:not([disabled]) { background: #2ed573; color: white; }
+.add-btn[disabled] { background: #f1f2f6; color: #a4b0be; cursor: not-allowed; }
 
-.back-btn {
-    padding: 8px 14px;
-    background: black;
-    color: white;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    margin-bottom: 15px;
-}
-
-/* --- Desktop Cart Box --- */
+/* Desktop Cart */
 .cart-box {
-    position: fixed;
-    right: 0;
-    top: 0;
-    bottom: 0;
-    width: 300px;
-    background: linear-gradient(180deg, #111827, #1f2937);
-    color: white;
-    padding: 24px 20px;
-    overflow-y: auto;
-    display: flex;
-    flex-direction: column;
-    z-index: 1000;
-    box-sizing: border-box;
+    position: fixed; right: 0; top: 0; bottom: 0; width: var(--cart-width);
+    background: var(--card-bg); border-left: 1px solid #f1f2f6; padding: 30px 25px;
+    display: flex; flex-direction: column; z-index: 1000; box-sizing: border-box; box-shadow: -5px 0 20px rgba(0,0,0,0.03);
 }
 
-.cart-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-    font-size: 14px;
-    background: rgba(255, 255, 255, 0.05);
-    padding: 10px;
-    border-radius: 8px;
-}
+.cart-box h3 { margin: 0 0 20px 0; font-size: 20px; border-bottom: 2px solid #f1f2f6; padding-bottom: 15px; }
+#cartItems { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
+#cartItems::-webkit-scrollbar { width: 5px; }
+#cartItems::-webkit-scrollbar-thumb { background: #dfe4ea; border-radius: 5px; }
 
-.qty-controls {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-}
+.cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
+.qty-controls { display: flex; align-items: center; gap: 10px; background: #f1f2f6; padding: 4px 8px; border-radius: 6px; }
+.qty-controls button { width: 24px; height: 24px; border: none; background: white; color: var(--text-main); border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
 
-.qty-controls button {
-    width: 26px;
-    height: 26px;
-    border: none;
-    background: #e11d48;
-    color: white;
-    border-radius: 4px;
-    cursor: pointer;
-}
-
-.total {
-    font-weight: bold;
-    margin-top: auto;
-    padding-top: 15px;
-}
+.cart-footer { margin-top: 20px; padding-top: 20px; border-top: 2px solid #f1f2f6; }
+.total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; margin: 0 0 15px 0; }
 
 #paymentMethod {
-    width: 100%;
-    padding: 10px;
-    margin: 10px 0;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-    font-size: 14px;
+    width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dfe4ea;
+    font-size: 14px; font-family: 'Poppins', sans-serif; margin-bottom: 15px; background: white;
 }
 
 .place-btn {
-    width: 100%;
-    padding: 12px;
-    background: #e11d48;
-    border: none;
-    color: white;
-    border-radius: 8px;
-    cursor: pointer;
-    font-weight: bold;
-    font-size: 16px;
+    width: 100%; padding: 15px; background: var(--primary); border: none; color: white;
+    border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; font-family: 'Poppins', sans-serif; transition: 0.2s;
+}
+.place-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
+
+/* Mobile Responsiveness */
+@media (max-width: 800px) {
+    body { margin-right: 0; padding-bottom: 0; display: flex; flex-direction: column; }
+    .header { padding: 15px 20px; justify-content: center; }
+    .container { width: 95%; margin: 15px auto; flex-grow: 1; }
+    .category-grid { gap: 10px; }
+    .category-card { padding: 8px 16px; font-size: 14px; }
+    .menu-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
+    .food-card img { height: 120px; }
+    .food-body { padding: 15px; }
+    .food-body h3 { font-size: 15px; }
+    .price { font-size: 16px; }
+    .add-btn { padding: 6px 12px; font-size: 14px; }
+    .cart-box {
+        position: static; width: 100%; height: auto; border-top: 4px solid #f1f2f6;
+        border-left: none; box-shadow: none; padding: 30px 20px; margin-top: 30px;
+    }
 }
 
-/* --- Receipt Modal (Popup) --- */
+/* ========================================= */
+/* --- 2. YOUR ORIGINAL RECEIPT MODAL CSS -- */
+/* ========================================= */
 .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    background: rgba(0, 0, 0, 0.6);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 2000;
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 2000;
 }
-
 .receipt-box {
-    background: #f4f6f8;
-    width: 90%;
-    max-width: 350px;
-    padding: 25px;
-    border-radius: 12px;
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    position: relative;
-    font-family: monospace;
-    color: #4b5563;
-    box-sizing: border-box;
+    background: #f4f6f8; width: 90%; max-width: 350px; padding: 25px;
+    border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+    position: relative; font-family: monospace; color: #4b5563; box-sizing: border-box;
 }
-
-.close-icon {
-    position: absolute;
-    top: 15px; right: 20px;
-    font-size: 24px;
-    cursor: pointer;
-    color: #9ca3af;
-}
-
+.close-icon { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #9ca3af; }
 .receipt-header { text-align: center; border-bottom: 1px dashed #9ca3af; padding-bottom: 15px; margin-bottom: 15px; }
 .receipt-header h2 { margin: 0 0 5px; color: #e11d48; font-family: sans-serif; font-size: 20px; }
 .token-no { font-size: 24px; font-weight: bold; color: #e11d48; margin-top: 10px; }
 .receipt-details { font-size: 13px; line-height: 1.6; border-bottom: 1px dashed #9ca3af; padding-bottom: 15px; margin-bottom: 15px; }
-.receipt-items { width: 100%; font-size: 14px; margin-bottom: 15px; }
+.receipt-items { width: 100%; font-size: 14px; margin-bottom: 15px; text-align: left; border-collapse: collapse;}
 .receipt-items th { text-align: left; padding-bottom: 10px; }
 .receipt-items td { padding: 5px 0; color: #6b7280; }
 .receipt-items .amount { text-align: right; }
@@ -230,60 +166,41 @@ body {
 .receipt-actions { display: flex; gap: 10px; margin-top: 20px; font-family: sans-serif; }
 .btn-download { flex: 1; padding: 12px; background: #e11d48; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
 .btn-close { flex: 1; padding: 12px; background: #374151; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-
-/* --- MOBILE RESPONSIVENESS (The Fix) --- */
-@media (max-width: 768px) {
-    body {
-        margin-right: 0; /* Removes the 320px right margin */
-        padding-bottom: 340px; /* Adds space at bottom so cart doesn't hide food */
-    }
-    
-    .cart-box {
-        width: 100%;
-        height: 320px; /* Fixes cart height at the bottom */
-        top: auto;
-        bottom: 0;
-        border-top: 4px solid #e11d48;
-        box-shadow: 0 -5px 15px rgba(0, 0, 0, 0.4);
-        border-radius: 20px 20px 0 0; /* Rounds the top corners */
-    }
-    
-    .category-grid, .menu-grid {
-        grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Better sizing for small phone screens */
-    }
-}
 </style>
 </head>
 
 <body>
 
 <div class="header">
-<h2>GUS Canteen Menu</h2>
+    <h2>GUS Canteen</h2>
 </div>
 
 <div class="container">
-<div id="categorySection"></div>
-<div id="itemSection" style="display:none;"></div>
+    <div id="categorySection"></div>
+    <div id="itemSection" style="display:none;"></div>
 </div>
 
 <div class="cart-box">
-<h3>Cart</h3>
-<div id="cartItems"></div>
-<p class="total">Total: ₹<span id="total">0</span></p>
-
-<select id="paymentMethod">
-<option value="cash">Cash</option>
-<option value="upi">UPI</option>
-</select>
-
-<button class="place-btn" onclick="placeOrder()">Place Order</button>
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    
+    <div class="cart-footer">
+        <div class="total">
+            <span>Total:</span>
+            <span>₹<span id="total">0</span></span>
+        </div>
+        <select id="paymentMethod">
+            <option value="cash">Cash 💵</option>
+            <option value="upi">UPI 📱</option>
+        </select>
+        <button class="place-btn" onclick="placeOrder()">Place Order</button>
+    </div>
 </div>
 
 <div id="receiptModal" class="modal-overlay">
     <div class="receipt-box">
         <span class="close-icon" onclick="closeReceipt()">&times;</span>
-        <div id="receiptContent">
-            </div>
+        <div id="receiptContent"></div>
         <div class="receipt-actions">
             <button class="btn-download" onclick="downloadReceiptPDF()">📄 Download PDF</button>
             <button class="btn-close" onclick="closeReceipt()">Close</button>
@@ -292,161 +209,155 @@ body {
 </div>
 
 <script>
-
 const API_URL="http://localhost:8000/api/item-list";
-
 let menuItems=[];
 let cart=[];
-let currentOrderData = null; // Stores the order for PDF downloading
+let currentOrderData = null; 
 
 async function fetchMenu(){
-const res=await fetch(API_URL);
-const data=await res.json();
-menuItems=data.data;
-loadCategories();
+    try {
+        const res=await fetch(API_URL);
+        const data=await res.json();
+        menuItems=data.data;
+        
+        loadCategories();
+        openCategory('All'); 
+    } catch (err) {
+        console.error("Failed to fetch menu:", err);
+    }
 }
 
 function getUniqueCategories(){
-return [...new Set(menuItems.filter(i=>i.available&&i.quantity>0&&i.category).map(i=>i.category))];
+    return [...new Set(menuItems.filter(i=>i.available&&i.quantity>0&&i.category).map(i=>i.category))];
 }
 
 function loadCategories() {
     document.getElementById("categorySection").style.display = "block";
-    document.getElementById("itemSection").style.display = "none";
-
     const categories = getUniqueCategories();
     let div = document.getElementById("categorySection");
 
-    div.innerHTML = "<div class='category-grid'></div>";
-    let grid = div.querySelector(".category-grid");
+    let html = `<div class='category-grid'>
+                    <div class="category-card active-cat" id="cat-All" onclick="openCategory('All')">🍔 All Items</div>`;
+    
+    categories.forEach(cat => {
+        let cleanID = cat.replace(/\s+/g, '');
+        html += `<div class="category-card" id="cat-${cleanID}" onclick="openCategory('${cat}')">🍽️ ${cat}</div>`;
+    });
+    
+    html += `</div>`;
+    div.innerHTML = html;
+}
 
-    if (categories.length === 0) {
-        grid.innerHTML = "<p>No items available</p>";
-        return;
+function openCategory(cat){
+    document.querySelectorAll('.category-card').forEach(el => el.classList.remove('active-cat'));
+    let cleanID = cat.replace(/\s+/g, '');
+    let activeBtn = document.getElementById(`cat-${cleanID}`);
+    if(activeBtn) activeBtn.classList.add('active-cat');
+
+    let itemDiv=document.getElementById("itemSection");
+    itemDiv.style.display="block";
+
+    let items = [];
+    if (cat === 'All') {
+        items = menuItems.filter(i => i.available && i.quantity > 0);
+    } else {
+        items = menuItems.filter(i => i.category === cat && i.available && i.quantity > 0);
     }
 
-    categories.forEach(cat => {
-        grid.innerHTML += `
-            <div class="category-card" onclick="openCategory('${cat}')">
-                ${cat}
+    itemDiv.innerHTML=`<div class="menu-grid"></div>`;
+    let grid=itemDiv.querySelector(".menu-grid");
+    
+    if(items.length === 0) {
+        grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #636e72;'>No items found.</p>";
+    } else {
+        renderItemCards(grid,items);
+    }
+}
+
+function renderItemCards(grid,items){
+    items.forEach(item=>{
+        let stockText=item.quantity<=5?`Only ${item.quantity} left`:"In Stock";
+        let stockColor = item.quantity<=5 ? '#ff9f43' : '#10ac84';
+        
+        grid.innerHTML+=`
+        <div class="food-card">
+            <img src="${item.image||''}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+            <div class="food-body">
+                <h3>${item.name}</h3>
+                <p class="desc">${item.description||""}</p>
+                <p style="font-size: 12px; color: ${stockColor}; margin: 0 0 10px 0; font-weight: 500;">${stockText}</p>
+                <div class="price-row">
+                    <p class="price">₹${item.price}</p>
+                    <button class="add-btn" ${item.quantity===0?"disabled":""} onclick="addToCart('${item._id}')">
+                        ${item.quantity===0 ? 'Sold Out' : '+ Add'}
+                    </button>
+                </div>
             </div>
+        </div>
         `;
     });
 }
 
-function openCategory(cat){
-document.getElementById("categorySection").style.display="none";
-let itemDiv=document.getElementById("itemSection");
-itemDiv.style.display="block";
-
-let items=menuItems.filter(i=>i.category===cat&&i.available&&i.quantity>0);
-
-itemDiv.innerHTML=`<button class="back-btn" onclick="loadCategories()">Back</button><div class="menu-grid"></div>`;
-let grid=itemDiv.querySelector(".menu-grid");
-renderItemCards(grid,items);
-}
-
-function renderItemCards(grid,items){
-items.forEach(item=>{
-
-let stockText=item.quantity<=5?`Only ${item.quantity} left`:"In Stock";
-
-grid.innerHTML+=`
-<div class="food-card">
-<img src="${item.image||''}">
-<div class="food-body">
-<h3>${item.name}</h3>
-<p>${item.description||""}</p>
-<p class="price">₹${item.price}</p>
-
-<p style="color:${item.quantity<=5?'orange':'green'};">${stockText}</p>
-
-<button class="add-btn"
-${item.quantity===0?"disabled":""}
-onclick="addToCart('${item._id}')">
-Add
-</button>
-
-</div>
-</div>
-`;
-});
-}
-
 function addToCart(id){
-let item=menuItems.find(m=>m._id===id);
-if(!item||item.quantity===0)return alert("Out of stock");
+    let item=menuItems.find(m=>m._id===id);
+    if(!item||item.quantity===0)return alert("Out of stock");
 
-let existing=cart.find(c=>c._id===id);
-
-if(existing){
-if(existing.qty>=item.quantity)return alert("Stock limit reached");
-existing.qty++;
-}else{
-cart.push({...item,qty:1});
-}
-
-updateCart();
+    let existing=cart.find(c=>c._id===id);
+    if(existing){
+        if(existing.qty>=item.quantity)return alert("Stock limit reached");
+        existing.qty++;
+    }else{
+        cart.push({...item,qty:1});
+    }
+    updateCart();
 }
 
 function increaseQty(id){
-let item=cart.find(c=>c._id===id);
-let original=menuItems.find(m=>m._id===id);
-
-if(item.qty>=original.quantity)return alert("Max stock reached");
-
-item.qty++;
-updateCart();
+    let item=cart.find(c=>c._id===id);
+    let original=menuItems.find(m=>m._id===id);
+    if(item.qty>=original.quantity)return alert("Max stock reached");
+    item.qty++;
+    updateCart();
 }
 
 function decreaseQty(id){
-let item=cart.find(c=>c._id===id);
-item.qty--;
-if(item.qty<=0)cart=cart.filter(c=>c._id!==id);
-updateCart();
+    let item=cart.find(c=>c._id===id);
+    item.qty--;
+    if(item.qty<=0)cart=cart.filter(c=>c._id!==id);
+    updateCart();
 }
 
 function updateCart(){
-let div=document.getElementById("cartItems");
-div.innerHTML="";
-let total=0;
+    let div=document.getElementById("cartItems");
+    div.innerHTML="";
+    let total=0;
 
-cart.forEach(item=>{
-total+=item.price*item.qty;
-
-div.innerHTML+=`
-<div class="cart-item">
-<span>${item.name}</span>
-<div class="qty-controls">
-<button onclick="decreaseQty('${item._id}')">-</button>
-<span>${item.qty}</span>
-<button onclick="increaseQty('${item._id}')">+</button>
-</div>
-</div>`;
-});
-
-document.getElementById("total").innerText=total;
+    cart.forEach(item=>{
+        total+=item.price*item.qty;
+        div.innerHTML+=`
+        <div class="cart-item">
+            <span style="flex-grow: 1; font-weight:600;">${item.name} <br><span style="color:#ff4757; font-size:13px;">₹${item.price}</span></span>
+            <div class="qty-controls">
+                <button onclick="decreaseQty('${item._id}')">-</button>
+                <span>${item.qty}</span>
+                <button onclick="increaseQty('${item._id}')">+</button>
+            </div>
+        </div>`;
+    });
+    document.getElementById("total").innerText=total;
 }
 
 async function placeOrder(){
-
   if(cart.length === 0){
-    alert("Cart empty");
+    alert("Cart is empty!");
     return;
   }
 
   let paymentMethod = document.getElementById("paymentMethod").value;
-
-  // CLEAN DATA AND INCLUDE itemId
   let orderItems = [];
 
   for(let i of cart){
-
-    if(!i.name || !i.price || !i.qty || !i._id){
-      console.error("Invalid item in cart:", i);
-      continue;
-    }
-
+    if(!i.name || !i.price || !i.qty || !i._id) continue;
     orderItems.push({
       itemId: String(i._id),
       name: String(i.name),
@@ -460,24 +371,22 @@ async function placeOrder(){
     return;
   }
 
+  const btn = document.querySelector('.place-btn');
+  btn.innerText = "Processing...";
+  btn.style.opacity = "0.7";
+
   try{
     let res = await fetch("http://localhost:8000/api/order-insert", {
       method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify({
-        items: orderItems,
-        paymentMethod: paymentMethod
-      })
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ items: orderItems, paymentMethod: paymentMethod })
     });
 
     let result = await res.json();
 
     if(result.status === 1){
-        currentOrderData = result.data; // Save for PDF
+        currentOrderData = result.data; 
         
-        // Build receipt HTML
         let itemsHtml = currentOrderData.items.map(item => `
             <tr>
                 <td>${item.name} x${item.quantity}</td>
@@ -487,6 +396,7 @@ async function placeOrder(){
 
         let dateStr = new Date().toLocaleString('en-IN');
 
+        // Fills your original HTML modal design so it looks perfect on screen
         document.getElementById('receiptContent').innerHTML = `
             <div class="receipt-header">
                 <h2>GUS Canteen</h2>
@@ -511,10 +421,8 @@ async function placeOrder(){
             </div>
         `;
 
-        // Show the modal
         document.getElementById('receiptModal').style.display = 'flex';
 
-        // Clear cart
         cart = [];
         updateCart();
         fetchMenu();
@@ -525,54 +433,100 @@ async function placeOrder(){
 
   } catch(err){
     console.error("ORDER ERROR:", err);
-    alert("❌ Order failed");
+    alert("❌ Order failed to process.");
+  } finally {
+      btn.innerText = "Place Order";
+      btn.style.opacity = "1";
   }
 }
 
-// Modal and PDF Functions
 function closeReceipt() {
     document.getElementById('receiptModal').style.display = 'none';
 }
 
+// THE BEAUTIFUL PDF GENERATOR (Replaced the boring one)
 function downloadReceiptPDF() {
     if (!currentOrderData) return;
-    
-    try {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        
-        doc.setFontSize(20);
-        doc.text("GUS Canteen Receipt", 105, 20, null, null, "center");
 
-        doc.setFontSize(12);
-        doc.text(`Invoice No: ${currentOrderData.invoiceNo}`, 20, 40);
-        doc.text(`Token No: ${currentOrderData.tokenNo}`, 20, 48);
-        doc.text(`Date: ${new Date().toLocaleDateString('en-IN')}`, 20, 56);
-        doc.text(`Payment: ${currentOrderData.paymentMethod.toUpperCase()}`, 20, 64);
+    const btn = document.querySelector('.btn-download');
+    const originalText = btn.innerText;
+    btn.innerText = "Generating PDF...";
+    btn.disabled = true;
 
-        doc.text("----------------------------------------------------------------", 20, 72);
+    let itemsHtml = currentOrderData.items.map(item => `
+        <tr>
+            <td style="padding: 4px 0;">${item.name}</td>
+            <td style="padding: 4px 0; text-align: center;">${item.quantity}</td>
+            <td style="padding: 4px 0; text-align: right;">₹${item.price}</td>
+            <td style="padding: 4px 0; text-align: right;">₹${item.price * item.quantity}</td>
+        </tr>
+    `).join('');
 
-        let yPos = 82;
-        currentOrderData.items.forEach((item, index) => {
-            doc.text(`${index + 1}. ${item.name}  (x${item.quantity})`, 20, yPos);
-            doc.text(`Rs. ${item.price * item.quantity}`, 160, yPos);
-            yPos += 10;
-        });
+    let printHtml = `
+        <div id="pdf-ticket" style="width: 300px; padding: 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000; background: white;">
+            <div style="text-align:center; margin-bottom:10px;">
+                <h2 style="font-size:24px; margin:0; font-weight:bold; color: #e11d48;">GUS Canteen</h2>
+                <p style="font-size:12px; margin:2px 0; color: #555;">Official Receipt</p>
+                <hr style="border: 1px dashed #aaa; margin:8px 0;">
+                <p style="font-size:26px; font-weight:bold; margin:0; color: #e11d48;">Token: ${currentOrderData.tokenNo}</p>
+                <hr style="border: 1px dashed #aaa; margin:8px 0;">
+            </div>
+            
+            <div style="font-size:13px; margin-bottom:15px; line-height: 1.5;">
+                <div>Invoice: <strong>#${currentOrderData.invoiceNo}</strong></div>
+                <div>Date: ${new Date().toLocaleString('en-IN')}</div>
+                <div>Payment: <strong>${currentOrderData.paymentMethod.toUpperCase()}</strong></div>
+            </div>
 
-        doc.text("----------------------------------------------------------------", 20, yPos);
-        
-        doc.setFontSize(14);
-        doc.text(`Total Amount: Rs. ${currentOrderData.total}`, 20, yPos + 12);
+            <table style="width: 100%; font-size: 13px; border-collapse: collapse; margin-bottom:15px;">
+                <thead style="border-bottom: 2px solid #000;">
+                    <tr>
+                        <th style="text-align: left; padding-bottom: 6px;">Item</th>
+                        <th style="text-align: center; padding-bottom: 6px;">Qty</th>
+                        <th style="text-align: right; padding-bottom: 6px;">Price</th>
+                        <th style="text-align: right; padding-bottom: 6px;">Total</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+            </table>
 
-        doc.save(`GUS_Token_${currentOrderData.tokenNo}.pdf`);
-    } catch (err) {
-        console.error("PDF Error:", err);
-        alert("Failed to generate PDF.");
-    }
+            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:bold; border-top: 2px solid #000; padding-top:10px;">
+                <span>TOTAL:</span>
+                <span>₹${currentOrderData.total}</span>
+            </div>
+
+            <div style="text-align:center; margin-top:25px; font-size:12px; color: #555;">
+                <p style="margin:0;">Thank you for dining with us!</p>
+                <p style="font-size:10px; margin-top:4px;">GUS Canteen</p>
+            </div>
+        </div>
+    `;
+
+    let tempDiv = document.createElement('div');
+    tempDiv.innerHTML = printHtml;
+    tempDiv.style.position = 'absolute';
+    tempDiv.style.left = '-9999px';
+document.body.appendChild(tempDiv);
+
+    let opt = {
+        margin:       0.2,
+        filename:     `GUS_Token_${currentOrderData.tokenNo}.pdf`,
+        image:        { type: 'jpeg', quality: 1 },
+        html2canvas:  { scale: 2 },
+        jsPDF:        { unit: 'in', format: [4, 6], orientation: 'portrait' } 
+    };
+
+    html2pdf().set(opt).from(tempDiv.firstElementChild).save().then(() => {
+        document.body.removeChild(tempDiv);
+        btn.innerText = originalText;
+        btn.disabled = false;
+    });
 }
 
+// Start everything up!
 fetchMenu();
-
 </script>
 
 </body>

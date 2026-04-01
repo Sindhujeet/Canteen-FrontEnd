@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000/api/order-list"; // Fixed lowercase 'const'
+const API_URL = "http://localhost:8000/api/order-list";
 
 // ── Fetch all orders ────────────────────────────────────────────
 async function fetchOrders() {
@@ -100,6 +100,7 @@ function displayOrders(orders) {
                     : '<span style="color:#16a34a; font-weight:bold;">✅ Paid</span>'
                 }
                 <button onclick="printOrder('${order._id}')" style="background:#3b82f6; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">🖨️ Print</button>
+                <button onclick="deleteOrder('${order._id}')" style="background:#ef4444; color: white; padding: 5px 10px; border: none; border-radius: 4px; cursor: pointer;">🗑️ Delete</button>
             </div>
         `;
 
@@ -119,7 +120,6 @@ async function markAsPaid(id) {
         const result = await response.json();
 
         if (result.status === 1) {
-            // Optional: alert("✅ Marked as paid!"); // Commented out so it's less annoying for the admin
             fetchOrders(); // refresh list
         }
 
@@ -152,6 +152,35 @@ function printOrder(id) {
 
     document.getElementById(`print-header-${id}`).style.display = "none";
     document.getElementById(`print-footer-${id}`).style.display = "none";
+}
+
+// ── Delete Order ────────────────────────────────────────────────
+async function deleteOrder(id) {
+    // 1. Ask for confirmation before deleting
+    if (!confirm("Are you sure you want to delete this bill? This cannot be undone.")) {
+        return; 
+    }
+
+    try {
+        // 2. Call your backend delete route
+        const response = await fetch(`http://localhost:8000/api/order-delete/${id}`, {
+            method: "DELETE", // Or "POST" depending on your backend setup
+            headers: { "Content-Type": "application/json" }
+        });
+
+        const result = await response.json();
+
+        // 3. If successful, refresh the page to remove the deleted item
+        if (result.status === 1 || response.ok) {
+            fetchOrders(); 
+        } else {
+            alert("❌ Could not delete order: " + (result.message || "Server error"));
+        }
+
+    } catch (err) {
+        console.error("Delete Error:", err);
+        alert("❌ Failed to connect to server. Check if your backend route is set up.");
+    }
 }
 
 // ── Init ────────────────────────────────────────────────────────
