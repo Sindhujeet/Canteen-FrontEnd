@@ -26,10 +26,10 @@
 body {
     background-color: var(--bg-color);
     /* Uncomment below if you want your Background.jpeg back! */
-    /* background-image: url("Background.jpeg"); */
-    /* background-size: cover; */
-    /* background-position: center; */
-    /* background-attachment: fixed; */
+     background-image: url("Background.jpeg"); 
+     background-size: cover; 
+     background-position: center; 
+     background-attachment: fixed; 
     
     min-height: 100vh;
     margin: 0;
@@ -50,6 +50,10 @@ body {
 }
 
 .header h2 { margin: 0; font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
+
+.header-logo {
+    width:auto; height: 45px; border-radius: 50%; margin-right: 15px;
+}
 
 .container { width: 92%; max-width: 1200px; margin: 30px auto; }
 
@@ -172,6 +176,7 @@ body {
 <body>
 
 <div class="header">
+    <img src="https://gurucharanuniversity.ac.in/images/gcu_logo.png" alt="GUS Logo" class="header-logo">
     <h2>GUS Canteen</h2>
 </div>
 
