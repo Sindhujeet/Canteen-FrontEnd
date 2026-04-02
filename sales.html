@@ -22,10 +22,13 @@
   </script>
 
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* Your original CSS remains 100% untouched */
     body {
       font-family: Arial, sans-serif;
       background: #f4f6f9;
@@ -55,6 +58,34 @@
       color: #666;
       margin-top: 4px;
     }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-export {
+      background: #10b981;
+      color: white;
+      border: none;
+      padding: 10px 16px;
+      border-radius: 10px;
+      font-weight: bold;
+      font-size: 14px;
+      cursor: pointer;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.08);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.2s, transform 0.1s;
+    }
+
+    .btn-export:hover { background: #059669; }
+    .btn-export:active { transform: scale(0.97); }
+    
+    .btn-pdf { background: #e11d48; }
+    .btn-pdf:hover { background: #be123c; }
 
     .date-badge {
       display: flex;
@@ -153,10 +184,6 @@
       margin-bottom: 16px;
     }
 
-    .chart-card.full {
-      grid-column: 1 / -1;
-    }
-
     .charts-bottom {
       display: grid;
       grid-template-columns: 2fr 1fr;
@@ -167,8 +194,9 @@
       .cards, .charts-row, .charts-bottom {
         grid-template-columns: 1fr;
       }
-      .chart-card.full {
-        grid-column: 1;
+      .header-actions {
+        flex-direction: column;
+        align-items: flex-end;
       }
     }
   </style>
@@ -191,8 +219,16 @@
       <h1>Sales Dashboard</h1>
       <p>Overview of your sales performance</p>
     </div>
-    <div class="date-badge">
-      📅 <span id="currentDate">Loading...</span>
+    <div class="header-actions">
+      <button class="btn-export btn-pdf" onclick="downloadPDF()">
+        📄 Export PDF
+      </button>
+      <button class="btn-export" onclick="downloadCSV()">
+        📊 Export CSV
+      </button>
+      <div class="date-badge">
+        📅 <span id="currentDate">Loading...</span>
+      </div>
     </div>
   </div>
 
@@ -257,7 +293,6 @@
 <script>
 const API_URL = "http://localhost:8000/api/sales";
 
-// Set current date
 const now = new Date();
 document.getElementById("currentDate").innerText = now.toLocaleDateString('en-IN', {
   weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
@@ -279,13 +314,11 @@ async function fetchSales() {
       updateCards(result.data);
       updateCharts(result.data);
     }
-
   } catch (err) {
     console.error("Failed to fetch sales:", err);
   }
 }
 
-// Added logout logic so it works globally
 function logout() {
     sessionStorage.clear();
     window.location.href = "login.html";
@@ -306,122 +339,176 @@ function updateCharts(data) {
   if (categoryChartInstance) categoryChartInstance.destroy();
   if (paymentChartInstance) paymentChartInstance.destroy();
 
-  // Daily Sales Chart
   dailyChartInstance = new Chart(document.getElementById("dailyChart"), {
     type: 'bar',
     data: {
       labels: data.dailyChart.labels,
-      datasets: [{
-        label: "Sales (₹)",
-        data: data.dailyChart.data,
-        backgroundColor: "#6096f5",
-        borderRadius: 6,
-        borderSkipped: false
-      }]
+      datasets: [{ label: "Sales (₹)", data: data.dailyChart.data, backgroundColor: "#6096f5", borderRadius: 6 }]
     },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          ticks: {
-            callback: val => "₹" + (val >= 1000 ? (val/1000).toFixed(1) + "k" : val)
-          },
-          grid: { color: "#f0f0f0" }
-        },
-        x: { grid: { display: false } }
-      }
-    }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } } } }
   });
 
-  // Monthly Sales Chart
   monthlyChartInstance = new Chart(document.getElementById("monthlyChart"), {
     type: 'bar',
     data: {
       labels: data.monthlyChart.labels,
-      datasets: [{
-        label: "Sales (₹)",
-        data: data.monthlyChart.data,
-        backgroundColor: "#22a861",
-        borderRadius: 6,
-        borderSkipped: false
-      }]
+      datasets: [{ label: "Sales (₹)", data: data.monthlyChart.data, backgroundColor: "#22a861", borderRadius: 6 }]
     },
-    options: {
-      responsive: true,
-      plugins: { legend: { display: false } },
-      scales: {
-        y: {
-          ticks: {
-            callback: val => "₹" + (val >= 1000 ? (val/1000).toFixed(1) + "k" : val)
-          },
-          grid: { color: "#f0f0f0" }
-        },
-        x: { grid: { display: false } }
-      }
-    }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } } } }
   });
 
-  // Category Chart
   categoryChartInstance = new Chart(document.getElementById("categoryChart"), {
     type: 'bar',
     data: {
       labels: data.categoryChart.labels,
-      datasets: [{
-        label: "Sales (₹)",
-        data: data.categoryChart.data,
-        backgroundColor: "#f59e0b",
-        borderRadius: 6,
-        borderSkipped: false
-      }]
+      datasets: [{ label: "Sales (₹)", data: data.categoryChart.data, backgroundColor: "#f59e0b", borderRadius: 6 }]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { display: false },
-        tooltip: {
-          callbacks: {
-            label: ctx => "₹" + ctx.raw.toLocaleString('en-IN')
-          }
-        }
-      },
-      scales: {
-        y: {
-          ticks: {
-            callback: val => "₹" + (val >= 1000 ? (val/1000).toFixed(1) + "k" : val)
-          },
-          grid: { color: "#f0f0f0" }
-        },
-        x: { grid: { display: false } }
-      }
-    }
+    options: { responsive: true, plugins: { legend: { display: false } }, scales: { x: { grid: { display: false } } } }
   });
 
-  // Payment Chart
   paymentChartInstance = new Chart(document.getElementById("paymentChart"), {
     type: 'doughnut',
     data: {
       labels: data.paymentChart.labels,
-      datasets: [{
-        data: data.paymentChart.data,
-        backgroundColor: ["#10b981", "#8b5cf6"],
-        borderWidth: 0
-      }]
+      datasets: [{ data: data.paymentChart.data, backgroundColor: ["#10b981", "#8b5cf6"], borderWidth: 0 }]
     },
-    options: {
-      responsive: true,
-      plugins: {
-        legend: { position: "bottom" },
-        tooltip: {
-          callbacks: {
-            label: ctx => ctx.label + ": ₹" + ctx.raw.toLocaleString('en-IN')
-          }
-        }
-      }
-    }
+    options: { responsive: true, plugins: { legend: { position: "bottom" } } }
   });
 }
 
+// ── PDF Download Logic ─────────────────────────────────────────
+async function downloadPDF() {
+    const btn = document.querySelector('.btn-pdf');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ Generating...";
+
+    try {
+        // Fetch both Order Data AND Sales Data (to get the Monthly Total)
+        const [orderRes, salesRes] = await Promise.all([
+            fetch("http://localhost:8000/api/order-list"),
+            fetch("http://localhost:8000/api/sales")
+        ]);
+        
+        const orderResult = await orderRes.json();
+        const salesResult = await salesRes.json();
+
+        if (!orderResult.data || orderResult.data.length === 0) {
+            btn.innerHTML = originalText;
+            return alert("No data to download!");
+        }
+
+        // Get Monthly Total
+        const monthlyTotal = salesResult.status === 1 ? salesResult.data.monthlySales : 0;
+
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+
+        // 1. Add Header
+        doc.setFontSize(18);
+        doc.setTextColor(17, 24, 39);
+        doc.text("GUS Canteen - Detailed Sales Report", 14, 20);
+        
+        doc.setFontSize(10);
+        doc.setTextColor(107, 114, 128);
+        doc.text(`Generated on: ${new Date().toLocaleString('en-IN')}`, 14, 26);
+
+        // 2. Add Monthly Total
+        doc.setFontSize(12);
+        doc.setTextColor(22, 163, 74); // Green Color
+        doc.text(`Monthly Sales Total: Rs. ${monthlyTotal.toLocaleString('en-IN')}`, 14, 34);
+
+        // 3. Prepare Table Data
+        const tableColumn = ["Date", "Invoice No", "Items & Quantity", "Pay Mode", "Status", "Total Amount"];
+        const tableRows = [];
+
+        orderResult.data.forEach(order => {
+            const date = new Date(order.date).toLocaleDateString('en-IN');
+            
+            // Format Items (e.g., "Burger (x2)\nWater (x1)")
+            let itemsText = "-";
+            if (order.items && order.items.length > 0) {
+                itemsText = order.items.map(item => `${item.name} (x${item.quantity})`).join('\n');
+            }
+
+            const rowData = [
+                date,
+                order.invoiceNo,
+                itemsText,
+                order.paymentMethod.toUpperCase(),
+                order.paymentStatus.toUpperCase(),
+                `Rs. ${order.total}`
+            ];
+            tableRows.push(rowData);
+        });
+
+        // 4. Generate Table
+        doc.autoTable({
+            head: [tableColumn],
+            body: tableRows,
+            startY: 40, // Start table below the headers
+            theme: 'striped',
+            headStyles: { fillColor: [225, 29, 72] }, // Red header to match your new button
+            styles: { fontSize: 9, cellPadding: 3, valign: 'middle' },
+            columnStyles: {
+                2: { cellWidth: 55 } // Make the Items column wider to fit food names
+            }
+        });
+
+        // 5. Save the PDF
+        doc.save(`GUS_Sales_Report_${new Date().toLocaleDateString('en-IN').replace(/\//g, '-')}.pdf`);
+
+    } catch (err) {
+        console.error("PDF Download Error:", err);
+        alert("Failed to download PDF. Check server connection.");
+    } finally {
+        btn.innerHTML = originalText;
+    }
+}
+
+// ── CSV Download Logic (Kept it exactly the same) ──────────────
+async function downloadCSV() {
+    const btn = document.querySelector('.btn-export:not(.btn-pdf)');
+    const originalText = btn.innerHTML;
+    btn.innerHTML = "⏳ Generating...";
+    
+    try {
+        const res = await fetch("http://localhost:8000/api/order-list");
+        const result = await res.json();
+        
+        if (!result.data || result.data.length === 0) {
+            btn.innerHTML = originalText;
+            return alert("No data to download!");
+        }
+
+        let csvContent = "Date,Invoice No,Token No,Payment Method,Payment Status,Total Amount\n";
+
+        result.data.forEach(order => {
+            let date = new Date(order.date).toLocaleString('en-IN').replace(/,/g, ''); 
+            // Added the apostrophe here so Excel stops breaking the Invoice number!
+            let row = `${date},'${order.invoiceNo},${order.tokenNo},${order.paymentMethod.toUpperCase()},${order.paymentStatus.toUpperCase()},${order.total}`;
+            csvContent += row + "\n";
+        });
+
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        
+        const link = document.createElement("a");
+        link.setAttribute("href", url);
+        link.setAttribute("download", `GUS_Canteen_Sales_${new Date().toLocaleDateString('en-IN').replace(/\//g, '-')}.csv`);
+        
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        
+    } catch (err) {
+        console.error("CSV Download Error:", err);
+        alert("Failed to download CSV.");
+    } finally {
+        btn.innerHTML = originalText;
+    }
+}
+
+// Initialize
 fetchSales();
 setInterval(fetchSales, 30000); 
 </script>
