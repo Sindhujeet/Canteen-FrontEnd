@@ -6,12 +6,12 @@
 <title>GUS Canteen | Quick Order</title>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
 /* ========================================= */
-/* --- 1. MODERN APP LAYOUT (Menu & Cart) -- */
+/* --- 1. CORE THEME & LAYOUT -------------- */
 /* ========================================= */
 :root {
     --primary: #ff4757; 
@@ -23,156 +23,190 @@
     --cart-width: 340px;
 }
 
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
 body {
     background-color: var(--bg-color);
-    /* Uncomment below if you want your Background.jpeg back! */
-     background-image: url("Background.jpeg"); 
-     background-size: cover; 
-     background-position: center; 
-     background-attachment: fixed; 
-    
+    background-image: url("Background.jpeg"); 
+    background-size: cover; 
+    background-position: center; 
+    background-attachment: fixed; 
     min-height: 100vh;
-    margin: 0;
+    /* desktop space for the sidebar */
     margin-right: var(--cart-width); 
     font-family: 'Poppins', sans-serif;
     color: var(--text-main);
 }
 
+/* ========================================= */
+/* --- 2. HEADER & LOGO (FIXED SIZE) ------- */
+/* ========================================= */
 .header {
     background: var(--card-bg);
-    padding: 20px 30px;
+    padding: 10px 30px;
     display: flex;
     align-items: center;
     box-shadow: 0 2px 10px rgba(0,0,0,0.05);
     position: sticky;
     top: 0;
     z-index: 100;
+    height: 80px; /* Locked header height */
 }
-
-.header h2 { margin: 0; font-size: 24px; font-weight: 700; color: var(--primary); letter-spacing: -0.5px; }
 
 .header-logo {
-    width:auto; height: 45px; border-radius: 50%; margin-right: 15px;
+    height: 60px !important; /* Forces logo to stay small */
+    width: auto !important;
+    object-fit: contain;
+    margin-right: 15px;
 }
 
-.container { width: 92%; max-width: 1200px; margin: 30px auto; }
+.header h2 { 
+    font-size: 22px; 
+    font-weight: 700; 
+    color: var(--primary); 
+}
 
-/* Category Filter Bar */
-.category-grid { display: flex; flex-wrap: wrap; gap: 15px; margin-bottom: 30px; }
+/* ========================================= */
+/* --- 3. MENU & CATEGORIES ---------------- */
+/* ========================================= */
+.container { 
+    width: 92%; 
+    max-width: 1200px; 
+    margin: 20px auto; 
+}
+
+.category-grid { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 12px; 
+    margin-bottom: 25px; 
+}
 
 .category-card {
-    background: white; padding: 10px 24px; border-radius: 30px; 
-    box-shadow: 0 2px 10px rgba(0,0,0,0.04); font-size: 15px;
-    font-weight: 600; color: var(--text-muted); cursor: pointer;
-    border: 2px solid transparent; transition: all 0.2s;
+    background: white; 
+    padding: 8px 20px; 
+    border-radius: 30px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+    font-size: 14px;
+    font-weight: 600; 
+    color: var(--text-muted); 
+    cursor: pointer;
+    border: 2px solid transparent; 
+    transition: 0.2s;
 }
 
-.category-card:hover { color: var(--primary); transform: translateY(-2px); }
-.category-card.active-cat { background: var(--primary); color: white; border-color: var(--primary); box-shadow: 0 4px 12px rgba(255, 71, 87, 0.2); }
+.category-card.active-cat { 
+    background: var(--primary); 
+    color: white; 
+}
 
-/* Food Menu */
-.menu-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 25px; }
+.menu-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 20px; 
+}
 
 .food-card {
-    background: var(--card-bg); border-radius: 16px; box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-    overflow: hidden; transition: transform 0.2s; display: flex; flex-direction: column;
+    background: var(--card-bg); 
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden; 
+    transition: 0.2s; 
+    display: flex; 
+    flex-direction: column;
 }
 
-.food-card:hover { transform: translateY(-4px); box-shadow: 0 10px 25px rgba(0,0,0,0.08); }
-.food-card img { width: 100%; height: 160px; object-fit: cover; background: #f1f2f6; }
+.food-card img { 
+    width: 100%; 
+    height: 150px !important; /* Prevents image from becoming giant */
+    object-fit: cover; 
+    background: #f1f2f6; 
+}
 
-.food-body { padding: 20px; display: flex; flex-direction: column; flex-grow: 1; }
-.food-body h3 { margin: 0 0 5px 0; font-size: 17px; color: var(--text-main); }
-.food-body .desc { font-size: 13px; color: var(--text-muted); margin: 0 0 15px 0; line-height: 1.4; flex-grow: 1; }
+.food-body { padding: 15px; flex-grow: 1; }
+.food-body h3 { font-size: 16px; margin-bottom: 5px; }
+.food-body .desc { font-size: 12px; color: var(--text-muted); min-height: 35px; }
 
-.price-row { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-.price { font-size: 18px; font-weight: 700; color: var(--text-main); margin: 0; }
+.price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.price { font-size: 17px; font-weight: 700; }
 
 .add-btn {
-    padding: 8px 20px; border: none; background: #e8f5e9; color: #2ed573;
-    font-weight: 600; border-radius: 8px; cursor: pointer; transition: 0.2s; font-family: 'Poppins', sans-serif;
+    padding: 6px 15px; 
+    border: none; 
+    background: #e8f5e9; 
+    color: #2ed573;
+    font-weight: 600; 
+    border-radius: 6px; 
+    cursor: pointer;
 }
-.add-btn:hover:not([disabled]) { background: #2ed573; color: white; }
-.add-btn[disabled] { background: #f1f2f6; color: #a4b0be; cursor: not-allowed; }
 
-/* Desktop Cart */
+/* ========================================= */
+/* --- 4. CART SIDEBAR --------------------- */
+/* ========================================= */
 .cart-box {
-    position: fixed; right: 0; top: 0; bottom: 0; width: var(--cart-width);
-    background: var(--card-bg); border-left: 1px solid #f1f2f6; padding: 30px 25px;
-    display: flex; flex-direction: column; z-index: 1000; box-sizing: border-box; box-shadow: -5px 0 20px rgba(0,0,0,0.03);
+    position: fixed; 
+    right: 0; 
+    top: 0; 
+    bottom: 0; 
+    width: var(--cart-width);
+    background: var(--card-bg); 
+    border-left: 1px solid #eee; 
+    padding: 20px;
+    display: flex; 
+    flex-direction: column; 
+    z-index: 1000;
 }
 
-.cart-box h3 { margin: 0 0 20px 0; font-size: 20px; border-bottom: 2px solid #f1f2f6; padding-bottom: 15px; }
-#cartItems { flex-grow: 1; overflow-y: auto; padding-right: 5px; }
-#cartItems::-webkit-scrollbar { width: 5px; }
-#cartItems::-webkit-scrollbar-thumb { background: #dfe4ea; border-radius: 5px; }
+.cart-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+.qty-controls { display: flex; gap: 8px; align-items: center; }
+.qty-controls button { width: 22px; height: 22px; cursor: pointer; border: 1px solid #ddd; background: #fff; }
 
-.cart-item { display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; font-size: 14px; font-weight: 500; }
-.qty-controls { display: flex; align-items: center; gap: 10px; background: #f1f2f6; padding: 4px 8px; border-radius: 6px; }
-.qty-controls button { width: 24px; height: 24px; border: none; background: white; color: var(--text-main); border-radius: 4px; cursor: pointer; font-weight: bold; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
-
-.cart-footer { margin-top: 20px; padding-top: 20px; border-top: 2px solid #f1f2f6; }
-.total { display: flex; justify-content: space-between; font-size: 18px; font-weight: 700; margin: 0 0 15px 0; }
-
-#paymentMethod {
-    width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #dfe4ea;
-    font-size: 14px; font-family: 'Poppins', sans-serif; margin-bottom: 15px; background: white;
-}
-
+.cart-footer { margin-top: auto; padding-top: 15px; border-top: 2px solid #eee; }
 .place-btn {
-    width: 100%; padding: 15px; background: var(--primary); border: none; color: white;
-    border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 16px; font-family: 'Poppins', sans-serif; transition: 0.2s;
+    width: 100%; padding: 12px; background: var(--primary); color: white;
+    border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 8px;
 }
-.place-btn:hover { background: var(--primary-hover); transform: translateY(-2px); }
 
-/* Mobile Responsiveness */
-@media (max-width: 800px) {
-    body { margin-right: 0; padding-bottom: 0; display: flex; flex-direction: column; }
-    .header { padding: 15px 20px; justify-content: center; }
-    .container { width: 95%; margin: 15px auto; flex-grow: 1; }
-    .category-grid { gap: 10px; }
-    .category-card { padding: 8px 16px; font-size: 14px; }
-    .menu-grid { grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 15px; }
-    .food-card img { height: 120px; }
-    .food-body { padding: 15px; }
-    .food-body h3 { font-size: 15px; }
-    .price { font-size: 16px; }
-    .add-btn { padding: 6px 12px; font-size: 14px; }
+.delivery-btn {
+    width: 100%; padding: 12px; background: #28a745; color: white;
+    border: none; border-radius: 6px; cursor: pointer; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+}
+
+/* ========================================= */
+/* --- 5. RESPONSIVE (MOBILE FIX) ---------- */
+/* ========================================= */
+@media (max-width: 900px) {
+    body { margin-right: 0; }
+    
     .cart-box {
-        position: static; width: 100%; height: auto; border-top: 4px solid #f1f2f6;
-        border-left: none; box-shadow: none; padding: 30px 20px; margin-top: 30px;
+        position: relative; 
+        width: 100%; 
+        height: auto; 
+        border-left: none; 
+        border-top: 4px solid var(--primary);
+        margin-top: 40px;
+    }
+
+    .menu-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
     }
 }
 
 /* ========================================= */
-/* --- 2. YOUR ORIGINAL RECEIPT MODAL CSS -- */
+/* --- 6. MODAL/RECEIPT -------------------- */
 /* ========================================= */
 .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 2000;
 }
-.receipt-box {
-    background: #f4f6f8; width: 90%; max-width: 350px; padding: 25px;
-    border-radius: 12px; box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
-    position: relative; font-family: monospace; color: #4b5563; box-sizing: border-box;
-}
-.close-icon { position: absolute; top: 15px; right: 20px; font-size: 24px; cursor: pointer; color: #9ca3af; }
-.receipt-header { text-align: center; border-bottom: 1px dashed #9ca3af; padding-bottom: 15px; margin-bottom: 15px; }
-.receipt-header h2 { margin: 0 0 5px; color: #e11d48; font-family: sans-serif; font-size: 20px; }
-.token-no { font-size: 24px; font-weight: bold; color: #e11d48; margin-top: 10px; }
-.receipt-details { font-size: 13px; line-height: 1.6; border-bottom: 1px dashed #9ca3af; padding-bottom: 15px; margin-bottom: 15px; }
-.receipt-items { width: 100%; font-size: 14px; margin-bottom: 15px; text-align: left; border-collapse: collapse;}
-.receipt-items th { text-align: left; padding-bottom: 10px; }
-.receipt-items td { padding: 5px 0; color: #6b7280; }
-.receipt-items .amount { text-align: right; }
-.receipt-total { font-size: 18px; font-weight: bold; display: flex; justify-content: space-between; border-top: 1px dashed #9ca3af; padding-top: 15px; margin-top: 5px; color: #1f2937; }
-.receipt-footer { text-align: center; font-size: 12px; margin-top: 25px; color: #9ca3af; }
-.receipt-actions { display: flex; gap: 10px; margin-top: 20px; font-family: sans-serif; }
-.btn-download { flex: 1; padding: 12px; background: #e11d48; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-close { flex: 1; padding: 12px; background: #374151; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; }
+.receipt-box { background: white; width: 90%; max-width: 350px; padding: 20px; border-radius: 10px; }
 </style>
 </head>
-
 <body>
 
 <div class="header">
@@ -188,160 +222,143 @@ body {
 <div class="cart-box">
     <h3>Your Cart</h3>
     <div id="cartItems"></div>
-    
     <div class="cart-footer">
-        <div class="total">
+        <div class="total" style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:15px;">
             <span>Total:</span>
             <span>₹<span id="total">0</span></span>
         </div>
-        <select id="paymentMethod">
+        <select id="paymentMethod" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
             <option value="cash">Cash 💵</option>
             <option value="upi">UPI 📱</option>
         </select>
-        <button class="place-btn" onclick="placeOrder()">Place Order</button>
+        
+        <button class="place-btn" onclick="placeOrder()">Place Order (Pickup)</button>
+        
+        <button class="delivery-btn" onclick="proceedToTeacherDelivery()">
+            <i class="fas fa-truck"></i> Teacher's Delivery
+        </button>
     </div>
 </div>
 
 <div id="receiptModal" class="modal-overlay">
     <div class="receipt-box">
-        <span class="close-icon" onclick="closeReceipt()">&times;</span>
         <div id="receiptContent"></div>
-        <div class="receipt-actions">
-            <button class="btn-download" onclick="downloadReceiptPDF()">📄 Download PDF</button>
-            <button class="btn-close" onclick="closeReceipt()">Close</button>
-        </div>
+        <button onclick="downloadReceiptPDF()" style="width:100%; padding:10px; background:#e11d48; color:white; border:none; border-radius:6px; margin-top:10px; cursor:pointer;">Download PDF</button>
+        <button onclick="closeReceipt()" style="width:100%; padding:10px; background:#374151; color:white; border:none; border-radius:6px; margin-top:5px; cursor:pointer;">Close</button>
     </div>
 </div>
-
 <script>
-const API_URL="http://localhost:8000/api/item-list";
-let menuItems=[];
-let cart=[];
-let currentOrderData = null; 
+const API_URL = "http://localhost:8000/api/item-list";
+let menuItems = [];
+let cart = [];
+let currentOrderData = null;
 
-async function fetchMenu(){
+// 1. Fetch Menu from Backend
+async function fetchMenu() {
     try {
-        const res=await fetch(API_URL);
-        const data=await res.json();
-        menuItems=data.data;
-        
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        menuItems = data.data;
         loadCategories();
-        openCategory('All'); 
+        openCategory('All');
     } catch (err) {
         console.error("Failed to fetch menu:", err);
+        document.getElementById("itemSection").innerHTML = "<p style='text-align:center; padding:20px;'>❌ Backend Not Connected</p>";
     }
 }
 
-function getUniqueCategories(){
-    return [...new Set(menuItems.filter(i=>i.available&&i.quantity>0&&i.category).map(i=>i.category))];
-}
-
+// 2. Load Categories Bar
 function loadCategories() {
-    document.getElementById("categorySection").style.display = "block";
-    const categories = getUniqueCategories();
+    const categories = [...new Set(menuItems.filter(i => i.available && i.quantity > 0 && i.category).map(i => i.category))];
     let div = document.getElementById("categorySection");
-
     let html = `<div class='category-grid'>
                     <div class="category-card active-cat" id="cat-All" onclick="openCategory('All')">🍔 All Items</div>`;
-    
     categories.forEach(cat => {
         let cleanID = cat.replace(/\s+/g, '');
         html += `<div class="category-card" id="cat-${cleanID}" onclick="openCategory('${cat}')">🍽️ ${cat}</div>`;
     });
-    
-    html += `</div>`;
-    div.innerHTML = html;
+    div.innerHTML = html + `</div>`;
 }
 
-function openCategory(cat){
+// 3. Open Specific Category
+function openCategory(cat) {
     document.querySelectorAll('.category-card').forEach(el => el.classList.remove('active-cat'));
     let cleanID = cat.replace(/\s+/g, '');
     let activeBtn = document.getElementById(`cat-${cleanID}`);
-    if(activeBtn) activeBtn.classList.add('active-cat');
+    if (activeBtn) activeBtn.classList.add('active-cat');
 
-    let itemDiv=document.getElementById("itemSection");
-    itemDiv.style.display="block";
-
-    let items = [];
-    if (cat === 'All') {
-        items = menuItems.filter(i => i.available && i.quantity > 0);
-    } else {
-        items = menuItems.filter(i => i.category === cat && i.available && i.quantity > 0);
-    }
-
-    itemDiv.innerHTML=`<div class="menu-grid"></div>`;
-    let grid=itemDiv.querySelector(".menu-grid");
+    let itemDiv = document.getElementById("itemSection");
+    itemDiv.style.display = "block";
     
-    if(items.length === 0) {
-        grid.innerHTML = "<p style='grid-column: 1/-1; text-align: center; color: #636e72;'>No items found.</p>";
-    } else {
-        renderItemCards(grid,items);
-    }
-}
+    let items = (cat === 'All') 
+        ? menuItems.filter(i => i.available && i.quantity > 0) 
+        : menuItems.filter(i => i.category === cat && i.available && i.quantity > 0);
 
-function renderItemCards(grid,items){
-    items.forEach(item=>{
-        let stockText=item.quantity<=5?`Only ${item.quantity} left`:"In Stock";
-        let stockColor = item.quantity<=5 ? '#ff9f43' : '#10ac84';
-        
-        grid.innerHTML+=`
+    itemDiv.innerHTML = `<div class="menu-grid"></div>`;
+    let grid = itemDiv.querySelector(".menu-grid");
+    
+    if (items.length === 0) {
+        grid.innerHTML = "<p style='grid-column:1/-1; text-align:center;'>No items available.</p>";
+        return;
+    }
+
+    items.forEach(item => {
+        let stockColor = item.quantity <= 5 ? '#ff9f43' : '#10ac84';
+        grid.innerHTML += `
         <div class="food-card">
-            <img src="${item.image||''}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/300x200?text=No+Image'">
+            <img src="${item.image || ''}" onerror="this.src='https://via.placeholder.com/300x200?text=Food'">
             <div class="food-body">
                 <h3>${item.name}</h3>
-                <p class="desc">${item.description||""}</p>
-                <p style="font-size: 12px; color: ${stockColor}; margin: 0 0 10px 0; font-weight: 500;">${stockText}</p>
+                <p class="desc">${item.description || ""}</p>
+                <p style="font-size: 12px; color: ${stockColor}; margin: 0 0 10px 0; font-weight: 600;">
+                    ${item.quantity <= 5 ? `Only ${item.quantity} left` : "In Stock"}
+                </p>
                 <div class="price-row">
                     <p class="price">₹${item.price}</p>
-                    <button class="add-btn" ${item.quantity===0?"disabled":""} onclick="addToCart('${item._id}')">
-                        ${item.quantity===0 ? 'Sold Out' : '+ Add'}
-                    </button>
+                    <button class="add-btn" onclick="addToCart('${item._id}')">+ Add</button>
                 </div>
             </div>
-        </div>
-        `;
+        </div>`;
     });
 }
 
-function addToCart(id){
-    let item=menuItems.find(m=>m._id===id);
-    if(!item||item.quantity===0)return alert("Out of stock");
-
-    let existing=cart.find(c=>c._id===id);
-    if(existing){
-        if(existing.qty>=item.quantity)return alert("Stock limit reached");
+// 4. Cart Logic
+function addToCart(id) {
+    let item = menuItems.find(m => m._id === id);
+    let existing = cart.find(c => c._id === id);
+    if (existing) {
+        if (existing.qty >= item.quantity) return alert("Stock limit reached");
         existing.qty++;
-    }else{
-        cart.push({...item,qty:1});
+    } else {
+        cart.push({ ...item, qty: 1 });
     }
     updateCart();
 }
 
-function increaseQty(id){
-    let item=cart.find(c=>c._id===id);
-    let original=menuItems.find(m=>m._id===id);
-    if(item.qty>=original.quantity)return alert("Max stock reached");
+function increaseQty(id) {
+    let item = cart.find(c => c._id === id);
+    let original = menuItems.find(m => m._id === id);
+    if (item.qty >= original.quantity) return alert("Max stock reached");
     item.qty++;
     updateCart();
 }
 
-function decreaseQty(id){
-    let item=cart.find(c=>c._id===id);
+function decreaseQty(id) {
+    let item = cart.find(c => c._id === id);
     item.qty--;
-    if(item.qty<=0)cart=cart.filter(c=>c._id!==id);
+    if (item.qty <= 0) cart = cart.filter(c => c._id !== id);
     updateCart();
 }
 
-function updateCart(){
-    let div=document.getElementById("cartItems");
-    div.innerHTML="";
-    let total=0;
-
-    cart.forEach(item=>{
-        total+=item.price*item.qty;
-        div.innerHTML+=`
+function updateCart() {
+    let div = document.getElementById("cartItems");
+    div.innerHTML = "";
+    let total = 0;
+    cart.forEach(item => {
+        total += item.price * item.qty;
+        div.innerHTML += `
         <div class="cart-item">
-            <span style="flex-grow: 1; font-weight:600;">${item.name} <br><span style="color:#ff4757; font-size:13px;">₹${item.price}</span></span>
+            <span style="flex-grow:1; font-weight:600;">${item.name} <br><span style="color:#ff4757; font-size:13px;">₹${item.price}</span></span>
             <div class="qty-controls">
                 <button onclick="decreaseQty('${item._id}')">-</button>
                 <span>${item.qty}</span>
@@ -349,147 +366,74 @@ function updateCart(){
             </div>
         </div>`;
     });
-    document.getElementById("total").innerText=total;
+    document.getElementById("total").innerText = total;
 }
 
-async function placeOrder(){
-  if(cart.length === 0){
-    alert("Cart is empty!");
-    return;
-  }
-
-  let paymentMethod = document.getElementById("paymentMethod").value;
-  let orderItems = [];
-
-  for(let i of cart){
-    if(!i.name || !i.price || !i.qty || !i._id) continue;
-    orderItems.push({
-      itemId: String(i._id),
-      name: String(i.name),
-      price: Number(i.price),
-      quantity: Number(i.qty)
-    });
-  }
-
-  if(orderItems.length === 0){
-    alert("Invalid cart data");
-    return;
-  }
-
-  const btn = document.querySelector('.place-btn');
-  btn.innerText = "Processing...";
-  btn.style.opacity = "0.7";
-
-  try{
-    let res = await fetch("http://localhost:8000/api/order-insert", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ items: orderItems, paymentMethod: paymentMethod })
-    });
-
-    let result = await res.json();
-
-    if(result.status === 1){
-        currentOrderData = result.data; 
-        
-        let itemsHtml = currentOrderData.items.map(item => `
-            <tr>
-                <td>${item.name} x${item.quantity}</td>
-                <td class="amount">₹${item.price * item.quantity}</td>
-            </tr>
-        `).join('');
-
-        let dateStr = new Date().toLocaleString('en-IN');
-
-        // Fills your original HTML modal design so it looks perfect on screen
-        document.getElementById('receiptContent').innerHTML = `
-            <div class="receipt-header">
-                <h2>GUS Canteen</h2>
-                <p>Official Receipt</p>
-                <div class="token-no">🎫 Token No: ${currentOrderData.tokenNo}</div>
-            </div>
-            <div class="receipt-details">
-                <div>Invoice ID: #${currentOrderData.invoiceNo}</div>
-                <div>Date: ${dateStr}</div>
-                <div>Payment: ${currentOrderData.paymentMethod.toUpperCase()}</div>
-            </div>
-            <table class="receipt-items">
-                <thead><tr><th>Item</th><th class="amount">Amount</th></tr></thead>
-                <tbody>${itemsHtml}</tbody>
-            </table>
-            <div class="receipt-total">
-                <span>TOTAL:</span>
-                <span>₹${currentOrderData.total}</span>
-            </div>
-            <div class="receipt-footer">
-                Thank you for dining with us!<br>GUS Canteen
-            </div>
-        `;
-
-        document.getElementById('receiptModal').style.display = 'flex';
-
-        cart = [];
-        updateCart();
-        fetchMenu();
-        
-    } else {
-        alert("❌ " + result.message);
-    }
-
-  } catch(err){
-    console.error("ORDER ERROR:", err);
-    alert("❌ Order failed to process.");
-  } finally {
-      btn.innerText = "Place Order";
-      btn.style.opacity = "1";
-  }
+// 5. Place Order & Bridge
+async function placeOrder() {
+    if (cart.length === 0) return alert("Cart is empty!");
+    const btn = document.querySelector('.place-btn');
+    btn.innerText = "Processing...";
+    try {
+        let res = await fetch("http://localhost:8000/api/order-insert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ 
+                items: cart.map(i => ({ itemId: i._id, name: i.name, price: i.price, quantity: i.qty })), 
+                paymentMethod: document.getElementById("paymentMethod").value 
+            })
+        });
+        let result = await res.json();
+        if (result.status === 1) {
+            currentOrderData = result.data;
+            renderReceipt();
+            document.getElementById('receiptModal').style.display = 'flex';
+            cart = []; updateCart(); fetchMenu();
+        }
+    } catch (err) { alert("Order failed."); }
+    finally { btn.innerText = "Place Order (Pickup)"; }
 }
 
-function closeReceipt() {
-    document.getElementById('receiptModal').style.display = 'none';
+function proceedToTeacherDelivery() {
+    if (cart.length === 0) return alert("Your cart is empty!");
+    localStorage.removeItem("cart");
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.location.href = "delivery.html";
 }
 
-// THE BEAUTIFUL PDF GENERATOR (Replaced the boring one)
-function downloadReceiptPDF() {
-    if (!currentOrderData) return;
-
-    const btn = document.querySelector('.btn-download');
-    const originalText = btn.innerText;
-    btn.innerText = "Generating PDF...";
-    btn.disabled = true;
-
+// 6. Receipt Modal Logic
+function renderReceipt() {
     let itemsHtml = currentOrderData.items.map(item => `
-        <tr>
-            <td style="padding: 4px 0;">${item.name}</td>
-            <td style="padding: 4px 0; text-align: center;">${item.quantity}</td>
-            <td style="padding: 4px 0; text-align: right;">₹${item.price}</td>
-            <td style="padding: 4px 0; text-align: right;">₹${item.price * item.quantity}</td>
+        <tr style="font-size: 13px; color: #333;">
+            <td style="padding: 5px 0;">${item.name}</td>
+            <td style="text-align: center; padding: 5px 0;">${item.quantity}</td>
+            <td style="text-align: center; padding: 5px 0;">Rs.${item.price}</td>
+            <td style="text-align: right; padding: 5px 0;">Rs.${item.price * item.quantity}</td>
         </tr>
     `).join('');
 
-    let printHtml = `
-        <div id="pdf-ticket" style="width: 300px; padding: 20px; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; color: #000; background: white;">
-            <div style="text-align:center; margin-bottom:10px;">
-                <h2 style="font-size:24px; margin:0; font-weight:bold; color: #e11d48;">GUS Canteen</h2>
-                <p style="font-size:12px; margin:2px 0; color: #555;">Official Receipt</p>
-                <hr style="border: 1px dashed #aaa; margin:8px 0;">
-                <p style="font-size:26px; font-weight:bold; margin:0; color: #e11d48;">Token: ${currentOrderData.tokenNo}</p>
-                <hr style="border: 1px dashed #aaa; margin:8px 0;">
-            </div>
+    document.getElementById('receiptContent').innerHTML = `
+        <div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 10px;">
+            <h2 style="color: #e11d48; margin-bottom: 5px; font-size: 22px;">GUS Canteen</h2>
+            <p style="font-size: 12px; margin: 0; color: #666;">Official Receipt</p>
             
-            <div style="font-size:13px; margin-bottom:15px; line-height: 1.5;">
-                <div>Invoice: <strong>#${currentOrderData.invoiceNo}</strong></div>
+            <hr style="border: none; border-top: 1px solid #ccc; margin: 15px 0;">
+            <h3 style="font-size: 20px; font-weight: bold; margin: 10px 0; color: #e11d48;">Token No: ${currentOrderData.tokenNo}</h3>
+            <hr style="border: none; border-top: 1px solid #ccc; margin: 15px 0;">
+
+            <div style="text-align: left; font-size: 12px; line-height: 1.6; margin-bottom: 15px;">
+                <div>Invoice No: #${currentOrderData.invoiceNo}</div>
                 <div>Date: ${new Date().toLocaleString('en-IN')}</div>
-                <div>Payment: <strong>${currentOrderData.paymentMethod.toUpperCase()}</strong></div>
+                <div>Payment: ${currentOrderData.paymentMethod.toUpperCase()}</div>
             </div>
 
-            <table style="width: 100%; font-size: 13px; border-collapse: collapse; margin-bottom:15px;">
-                <thead style="border-bottom: 2px solid #000;">
-                    <tr>
-                        <th style="text-align: left; padding-bottom: 6px;">Item</th>
-                        <th style="text-align: center; padding-bottom: 6px;">Qty</th>
-                        <th style="text-align: right; padding-bottom: 6px;">Price</th>
-                        <th style="text-align: right; padding-bottom: 6px;">Total</th>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                <thead>
+                    <tr style="font-size: 13px; border-bottom: 1px solid #333; font-weight: bold;">
+                        <th style="text-align: left; padding-bottom: 5px;">Item</th>
+                        <th style="text-align: center; padding-bottom: 5px;">Qty</th>
+                        <th style="text-align: center; padding-bottom: 5px;">Price</th>
+                        <th style="text-align: right; padding-bottom: 5px;">Subtotal</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -497,42 +441,36 @@ function downloadReceiptPDF() {
                 </tbody>
             </table>
 
-            <div style="display:flex; justify-content:space-between; font-size:18px; font-weight:bold; border-top: 2px solid #000; padding-top:10px;">
-                <span>TOTAL:</span>
-                <span>₹${currentOrderData.total}</span>
+            <hr style="border: none; border-top: 1px solid #333; margin: 10px 0;">
+            <div style="display: flex; justify-content: flex-end; font-size: 16px; font-weight: bold;">
+                <span>Total: Rs.${currentOrderData.total}</span>
             </div>
 
-            <div style="text-align:center; margin-top:25px; font-size:12px; color: #555;">
-                <p style="margin:0;">Thank you for dining with us!</p>
-                <p style="font-size:10px; margin-top:4px;">GUS Canteen</p>
+            <div style="margin-top: 30px; font-size: 11px; color: #888;">
+                Thank you for dining with us!<br>GUS Canteen
             </div>
         </div>
     `;
-
-    let tempDiv = document.createElement('div');
-    tempDiv.innerHTML = printHtml;
-    tempDiv.style.position = 'absolute';
-    tempDiv.style.left = '-9999px';
-document.body.appendChild(tempDiv);
-
-    let opt = {
-        margin:       0.2,
-        filename:     `GUS_Token_${currentOrderData.tokenNo}.pdf`,
-        image:        { type: 'jpeg', quality: 1 },
-        html2canvas:  { scale: 2 },
-        jsPDF:        { unit: 'in', format: [4, 6], orientation: 'portrait' } 
-    };
-
-    html2pdf().set(opt).from(tempDiv.firstElementChild).save().then(() => {
-        document.body.removeChild(tempDiv);
-        btn.innerText = originalText;
-        btn.disabled = false;
-    });
 }
 
-// Start everything up!
+function closeReceipt() { document.getElementById('receiptModal').style.display = 'none'; }
+function downloadReceiptPDF() {
+    if (!currentOrderData) return;
+
+    const element = document.getElementById('receiptContent');
+    
+    const opt = {
+        margin:       [0.5, 0.5],
+        filename:     `GUS_Token_${currentOrderData.tokenNo}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 3, backgroundColor: '#ffffff' },
+        jsPDF:        { unit: 'in', format: [4, 6], orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+// Initialize
 fetchMenu();
 </script>
-
 </body>
 </html>

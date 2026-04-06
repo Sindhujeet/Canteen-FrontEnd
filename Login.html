@@ -8,7 +8,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
 
     <style>
-        /* --- CSS STYLES --- */
         * {
             margin: 0;
             padding: 0;
@@ -30,7 +29,6 @@
         .login-card {
             background: rgba(255, 255, 255, 0.1);
             backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
             padding: 40px;
             border-radius: 20px;
             width: 400px;
@@ -41,7 +39,6 @@
 
         .logo img {
             margin-bottom: 15px;
-            filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.2));
         }
 
         h1 {
@@ -78,17 +75,6 @@
             align-items: center;
             gap: 12px;
             border: 1px solid rgba(255, 255, 255, 0.1);
-            transition: 0.3s;
-        }
-
-        .input-box:focus-within {
-            border-color: #3498db;
-            background: rgba(0, 0, 0, 0.3);
-        }
-
-        .input-box i {
-            color: #3498db;
-            font-size: 16px;
         }
 
         .input-box input {
@@ -97,7 +83,6 @@
             color: white;
             outline: none;
             width: 100%;
-            font-size: 15px;
         }
 
         .login-btn {
@@ -108,16 +93,12 @@
             background: #3498db;
             color: white;
             font-weight: bold;
-            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
+            transition: 0.3s;
         }
 
         .login-btn:hover {
             background: #2980b9;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(52, 152, 219, 0.4);
         }
 
         .footer {
@@ -126,11 +107,6 @@
             font-size: 12px;
             text-align: center;
         }
-
-        .footer p {
-            margin-top: 5px;
-            opacity: 0.6;
-        }
     </style>
 </head>
 
@@ -138,7 +114,7 @@
 
     <div class="login-card">
         <div class="logo">
-            <img src="https://www.gurucharanuniversity.ac.in/images/gcu_logo.png" width="80" height="110" alt="GCU Logo">
+            <img src="https://www.gurucharanuniversity.ac.in/images/gcu_logo.png" width="80" height="110">
         </div>
 
         <h1>Gurucharan University Canteen</h1>
@@ -160,48 +136,108 @@
             </div>
         </div>
 
-        <button class="login-btn" onclick="handleLogin()">Sign In</button>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button class="login-btn" style="flex:1;" onclick="handleLogin()">Sign In</button>
+            <button class="login-btn" style="flex:1; background:#64748b;" onclick="openRegister()">Register</button>
+        </div>
+
+        <p style="margin-top:15px;font-size:13px;">
+            Don't have an account?
+            <span style="color:#3498db;cursor:pointer;" onclick="openRegister()">Register</span>
+        </p>
+    </div>
+
+    <div id="registerPopup" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter: blur(5px);justify-content:center;align-items:center;z-index: 100;">
+        <div style="background:#1e293b;padding:30px;border-radius:15px;width:350px;border: 1px solid rgba(255,255,255,0.1);">
+            <h3 style="text-align:center;margin-bottom:15px;">Register Account</h3>
+
+            <input type="text" id="regUsername" placeholder="Username" style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;background:#0f172a;color:white;outline:none;">
+            <input type="password" id="regPassword" placeholder="Password" style="width:100%;padding:10px;margin-bottom:10px;border-radius:8px;border:none;background:#0f172a;color:white;outline:none;">
+            
+            <label style="margin-bottom: 5px;">Select Role</label>
+            <select id="regRole" style="width:100%;padding:10px;margin-bottom:15px;border-radius:8px;border:none;background:#0f172a;color:white;outline:none;">
+                <option value="staff">Staff</option>
+                <option value="manager">Manager</option>
+            </select>
+
+            <button onclick="handleRegister()" style="width:100%;padding:12px;border:none;border-radius:8px;background:#3498db;color:white;font-weight:bold;cursor:pointer;">Create Account</button>
+            <button onclick="closeRegister()" style="width:100%;padding:10px;margin-top:8px;border:none;border-radius:8px;background:#64748b;color:white;cursor:pointer;">Cancel</button>
+        </div>
     </div>
 
     <div class="footer">
-        Made with ❤️ By Team Sigma 
-        <p>Copyright © 2026 Canteen Manager. All rights reserved.</p>
+        Made with ❤️ By Team Sigma
     </div>
 
-    <script>
+<script>
+// ── LOGIN LOGIC ──────────────────────────────────────────────
 async function handleLogin() {
     const user = document.getElementById("username").value.trim();
     const pass = document.getElementById("password").value.trim();
 
-    if (!user || !pass) {
-        alert("Please enter both username and password.");
-        return;
-    }
+    if(!user || !pass) return alert("Please enter both username and password.");
 
     try {
-        // 👇 THIS IS THE BRIDGE BETWEEN FRONTEND AND BACKEND 👇
-        const response = await fetch("http://localhost:8000/api/login", {
+        const res = await fetch("http://localhost:8000/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: user, password: pass })
         });
 
-        const result = await response.json();
+        const result = await res.json();
 
         if (result.status === 1) {
-            // Login Success! 
+            // 🔥 CRITICAL: Save the session data for the Sales page to check
             sessionStorage.setItem("isAdminLoggedIn", "true");
-            sessionStorage.setItem("userRole", result.role);
+            sessionStorage.setItem("userRole", result.role); // e.g., 'manager'
+            sessionStorage.setItem("userName", user);
 
-            alert("Welcome " + result.role.toUpperCase() + "!");
+            alert("Welcome back, " + user + " (" + result.role.toUpperCase() + ")");
             window.location.href = "dashboard.html";
         } else {
-            // Login Failed (Wrong password or username)
-            alert(result.message); 
+            alert(result.message);
         }
     } catch (err) {
-        console.error("Fetch error:", err);
-        alert("Cannot connect to the backend server. Is your Node server running?");
+        console.error("Login Error:", err);
+        alert("Could not connect to server. Is the backend running?");
+    }
+}
+
+// ── REGISTRATION POPUP LOGIC ──────────────────────────────────
+function openRegister() {
+    document.getElementById("registerPopup").style.display = "flex";
+}
+
+function closeRegister() {
+    document.getElementById("registerPopup").style.display = "none";
+}
+
+// ── REGISTRATION LOGIC ───────────────────────────────────────
+async function handleRegister() {
+    const user = document.getElementById("regUsername").value.trim();
+    const pass = document.getElementById("regPassword").value.trim();
+    const role = document.getElementById("regRole").value;
+
+    if(!user || !pass) return alert("All fields are required.");
+
+    try {
+        const res = await fetch("http://localhost:8000/api/register", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ username: user, password: pass, role: role })
+        });
+
+        const result = await res.json();
+
+        if (result.status === 1) {
+            alert("Registered Successfully! You can now sign in.");
+            closeRegister();
+        } else {
+            alert(result.message || "User already exists!");
+        }
+    } catch (err) {
+        console.error("Register Error:", err);
+        alert("Server error. Please try again later.");
     }
 }
 </script>

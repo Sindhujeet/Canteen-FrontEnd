@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GUS Teacher Delivery | University Campus</title>
+    
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(120deg, #0f2027, #203a43, #2c5364);
+            color: #333;
+            overflow: hidden;
+            padding: 20px;
+        }
+
+        .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 2000;
+}
+.receipt-box { 
+    background: white; 
+    width: 90%; 
+    max-width: 350px; 
+    padding: 20px; 
+    border-radius: 10px; 
+}
+.btn-download { 
+    width:100%; 
+    padding:12px;
+    background:#e11d48; 
+    color:white; 
+    border:none; 
+    border-radius:6px; 
+    margin-top:15px; 
+    cursor:pointer; 
+    font-weight:bold; 
+
+        }
+        .btn-close { 
+            width:100%; 
+            padding:12px; 
+            background:#374151; 
+            color:white; 
+            border:none; 
+            border-radius:6px; 
+            margin-top:8px; 
+            cursor:pointer; 
+            font-weight:bold; 
+        }
+        .delivery-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            padding: 30px;
+            border-radius: 20px;
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+            text-align: center;
+            max-height: 95vh;
+            overflow-y: auto;
+        }
+
+        .card-header {
+            margin-bottom: 20px;
+            border-bottom: 2px solid #edf2f7;
+            padding-bottom: 15px;
+        }
+
+        .logo-container {
+            margin-bottom: 10px;
+        }
+
+        .card-header h2 {
+            color: #1a202c;
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 10px;
+        }
+
+        .subtitle {
+            font-size: 13px;
+            color: #718096;
+            margin-top: 5px;
+            font-weight: 500;
+        }
+
+        /* Order Summary Section */
+        .order-summary {
+            background: #f8fafc;
+            border: 1px dashed #cbd5e1;
+            border-radius: 12px;
+            padding: 12px;
+            margin-bottom: 18px;
+            text-align: left;
+        }
+
+        .summary-title {
+            font-size: 13px;
+            font-weight: bold;
+            color: #2c5364;
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .item-list {
+            font-size: 13px;
+            color: #4a5568;
+            max-height: 80px;
+            overflow-y: auto;
+        }
+
+        .summary-total {
+            border-top: 1px solid #e2e8f0;
+            margin-top: 8px;
+            padding-top: 8px;
+            display: flex;
+            justify-content: space-between;
+            font-weight: bold;
+            font-size: 15px;
+            color: #1a202c;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+            text-align: left;
+        }
+
+        label {
+            display: block;
+            font-size: 12px;
+            margin-bottom: 5px;
+            color: #4a5568;
+            font-weight: 600;
+            padding-left: 3px;
+        }
+
+        .input-wrapper {
+            background: #f1f5f9;
+            border-radius: 10px;
+            padding: 9px 12px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            border: 1px solid #e2e8f0;
+            transition: 0.2s;
+        }
+
+        .input-wrapper:focus-within {
+            border-color: #28a745;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+        }
+
+        .input-wrapper i {
+            color: #718096;
+            font-size: 14px;
+            width: 18px;
+            text-align: center;
+        }
+
+        .input-wrapper input, .input-wrapper select {
+            background: transparent;
+            border: none;
+            color: #1a202c;
+            outline: none;
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .order-btn {
+            width: 100%;
+            padding: 14px;
+            border: none;
+            border-radius: 10px;
+            background: #28a745;
+            color: white;
+            font-weight: bold;
+            font-size: 16px;
+            cursor: pointer;
+            transition: 0.2s;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .order-btn:hover {
+            background: #218838;
+            transform: translateY(-2px);
+        }
+
+        #message {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            border-radius: 8px;
+            padding: 10px;
+            display: none;
+        }
+
+        .footer-tag {
+            margin-top: 15px;
+            font-size: 11px;
+            color: #94a3b8;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="delivery-card">
+        <div class="card-header">
+            <div class="logo-container">
+                <img src="https://www.gurucharanuniversity.ac.in/images/gcu_logo.png" width="70" height="95" style="filter: drop-shadow(0px 4px 6px rgba(0,0,0,0.1));">
+            </div>
+            <h2>GUS Canteen</h2>
+            <p class="subtitle">Teacher Delivery Checkout</p>
+        </div>
+
+        <div class="order-summary">
+            <div class="summary-title"><i class="fas fa-shopping-cart"></i> Selected Items</div>
+            <div id="itemList" class="item-list">
+                </div>
+            <div class="summary-total">
+                <span>Total Amount:</span>
+                <span id="totalPriceDisplay">₹0</span>
+            </div>
+        </div>
+        
+        <form id="deliveryForm">
+            <div class="form-group">
+                <label>Full Name</label>
+                <div class="input-wrapper">
+                    <i class="fa-regular fa-user"></i>
+                    <input type="text" id="teacherName" placeholder="Teacher's Name" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Department / Room No.</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-building"></i>
+                    <input type="text" id="department" placeholder="e.g. CS Room 31" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Contact Number</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-phone"></i>
+                    <input type="tel" id="phoneNumber" placeholder="10-digit mobile" pattern="[0-9]{10}" required>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>Payment Mode</label>
+                <div class="input-wrapper">
+                    <i class="fa-solid fa-wallet"></i>
+                    <select id="paymentMode">
+                        <option value="Cash">Cash on Delivery</option>
+                        <option value="UPI">UPI Transfer</option>
+                    </select>
+                </div>
+            </div>
+
+            <button type="submit" class="order-btn">
+                <i class="fas fa-paper-plane"></i> Confirm & Place Order
+            </button>
+        </form>
+        
+        <div id="message"></div>
+
+        <div class="footer-tag">
+            Made with ❤️ By Team Sigma
+        </div>
+    </div>
+
+    <div id="receiptModal" class="modal-overlay">
+    <div class="receipt-box">
+        <div id="receiptContent"></div>
+        <button class="btn-download" onclick="downloadReceiptPDF()">📄 Download PDF</button>
+        <button class="btn-close" onclick="closeReceipt()">Close & Return to Menu</button>
+    </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<script>
+    const rawCart = localStorage.getItem("cart");
+    const cart = rawCart ? JSON.parse(rawCart) : [];
+    const listDiv = document.getElementById("itemList");
+    const totalDisplay = document.getElementById("totalPriceDisplay");
+    
+    let finalBill = 0;
+    let currentOrderData = null; // Store for the PDF
+    listDiv.innerHTML = ""; 
+
+    // 1. Calculate and display cart
+    if (cart.length === 0) {
+        listDiv.innerHTML = "<p style='color:red;'>Cart is empty. Please return to menu.</p>";
+    } else {
+        cart.forEach(item => {
+            let price = Number(item.price || 0);
+            let qty = Number(item.qty || item.quantity || 1);
+            let subtotal = price * qty;
+            finalBill += subtotal;
+            listDiv.innerHTML += `
+                <div style="display:flex; justify-content:space-between; margin-bottom:8px; border-bottom:1px solid #eee; padding-bottom:5px;">
+                    <span>${item.name} <small>(x${qty})</small></span>
+                    <span style="font-weight:600;">Rs.${subtotal}</span>
+                </div>`;
+        });
+        totalDisplay.innerText = "Rs." + finalBill;
+    }
+
+    // 2. Form Submission (Send to same API as User Order!)
+    document.getElementById('deliveryForm').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        const btn = e.target.querySelector('button');
+        btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> Processing...";
+        btn.disabled = true;
+
+        const orderData = {
+            orderType: "Delivery", // Tells your DB this is a delivery
+            teacherName: document.getElementById('teacherName').value,
+            department: document.getElementById('department').value,
+            phoneNumber: document.getElementById('phoneNumber').value,
+            paymentMethod: document.getElementById('paymentMode').value, // Renamed to match user-order
+            items: cart.map(i => ({ itemId: i._id, name: i.name, price: i.price, quantity: i.qty || i.quantity })),
+            totalAmount: finalBill
+        };
+
+        try {
+            // Sending to order-insert so it shows on the Billing Page
+            const res = await fetch('http://localhost:8000/api/order-insert', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(orderData)
+            });
+            const result = await res.json();
+            
+            if(result.status === 1) {
+                // Save data for the receipt popup
+                currentOrderData = {
+                    tokenNo: result.data ? result.data.tokenNo : Math.floor(Math.random() * 100),
+                    invoiceNo: result.data ? result.data.invoiceNo : Date.now(),
+                    paymentMethod: orderData.paymentMethod,
+                    total: finalBill,
+                    items: orderData.items,
+                    teacherName: orderData.teacherName,
+                    department: orderData.department
+                };
+                
+                renderReceipt();
+                document.getElementById('receiptModal').style.display = 'flex';
+            } else {
+                alert("Order failed: " + result.message);
+            }
+        } catch (err) {
+            alert("Database Connection Failed!");
+        } finally {
+            btn.innerHTML = "Place Order";
+            btn.disabled = false;
+        }
+    });
+
+    // 3. Render the Exact Thermal Design
+    function renderReceipt() {
+        let itemsHtml = currentOrderData.items.map(item => `
+            <tr style="font-size: 13px; color: #333;">
+                <td style="padding: 5px 0;">${item.name}</td>
+                <td style="text-align: center; padding: 5px 0;">${item.quantity}</td>
+                <td style="text-align: center; padding: 5px 0;">Rs.${item.price}</td>
+                <td style="text-align: right; padding: 5px 0;">Rs.${item.price * item.quantity}</td>
+            </tr>
+        `).join('');
+
+        document.getElementById('receiptContent').innerHTML = `
+            <div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 10px;">
+                <h2 style="color: #e11d48; margin-bottom: 5px; font-size: 22px;">GUS Canteen</h2>
+                <p style="font-size: 12px; margin: 0; color: #666;">Delivery Receipt</p>
+                
+                <hr style="border: none; border-top: 1px solid #ccc; margin: 15px 0;">
+                <h3 style="font-size: 20px; font-weight: bold; margin: 10px 0; color: #e11d48;">Token No: ${currentOrderData.tokenNo}</h3>
+                <hr style="border: none; border-top: 1px solid #ccc; margin: 15px 0;">
+
+                <div style="text-align: left; font-size: 12px; line-height: 1.6; margin-bottom: 15px;">
+                    <div>Invoice No: #${currentOrderData.invoiceNo}</div>
+                    <div>Date: ${new Date().toLocaleString('en-IN')}</div>
+                    <div>To: ${currentOrderData.teacherName} (${currentOrderData.department})</div>
+                    <div>Payment: ${currentOrderData.paymentMethod.toUpperCase()}</div>
+                </div>
+
+                <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                    <thead>
+                        <tr style="font-size: 13px; border-bottom: 1px solid #333; font-weight: bold;">
+                            <th style="text-align: left; padding-bottom: 5px;">Item</th>
+                            <th style="text-align: center; padding-bottom: 5px;">Qty</th>
+                            <th style="text-align: center; padding-bottom: 5px;">Price</th>
+                            <th style="text-align: right; padding-bottom: 5px;">Subtotal</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        ${itemsHtml}
+                    </tbody>
+                </table>
+
+                <hr style="border: none; border-top: 1px solid #333; margin: 10px 0;">
+                <div style="display: flex; justify-content: flex-end; font-size: 16px; font-weight: bold;">
+                    <span>Total: Rs.${currentOrderData.total}</span>
+                </div>
+
+                <div style="margin-top: 30px; font-size: 11px; color: #888;">
+                    Deliver to department immediately.<br>GUS Canteen
+                </div>
+            </div>
+        `;
+    }
+
+    // 4. Download PDF Logic
+    function downloadReceiptPDF() {
+        if (!currentOrderData) return;
+        const element = document.getElementById('receiptContent');
+        const opt = {
+            margin:       [0.5, 0.5],
+            filename:     `GUS_Delivery_${currentOrderData.tokenNo}.pdf`,
+            image:        { type: 'jpeg', quality: 0.98 },
+            html2canvas:  { scale: 3, backgroundColor: '#ffffff' },
+            jsPDF:        { unit: 'in', format: [4, 6], orientation: 'portrait' }
+        };
+        html2pdf().set(opt).from(element).save();
+    }
+
+    // 5. Close Button Logic
+    function closeReceipt() {
+        document.getElementById('receiptModal').style.display = 'none';
+        localStorage.removeItem("cart"); // Empty the pocket
+        window.location.href = "user-order.html"; // Send back to menu
+    }
+</script>
+
+</body>
+</html>

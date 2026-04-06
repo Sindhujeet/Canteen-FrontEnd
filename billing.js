@@ -42,6 +42,14 @@ function displayOrders(orders) {
             </tr>
         `).join("");
 
+        // ==========================================
+        // NEW: DELIVERY OR PICKUP BADGE LOGIC
+        // ==========================================
+        let badgeHTML = order.orderType === "Delivery" 
+            ? `<div style="background: #28a745; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-left: 10px;">🚚 Delivery (${order.department || 'N/A'})</div>
+               <div style="font-size: 12px; color: #555; margin-top: 5px; display: block;">👤 ${order.teacherName || 'Unknown'} | 📞 ${order.phoneNumber || 'N/A'}</div>` 
+            : `<div style="background: #ff4757; color: white; padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; display: inline-block; margin-left: 10px;">🥡 Pickup</div>`;
+
         const card = document.createElement("div");
         card.classList.add("order-card");
         card.dataset.id = order._id;
@@ -55,9 +63,11 @@ function displayOrders(orders) {
                 <p style="font-size:22px; font-weight:bold; color:#e11d48;">Token No: ${order.tokenNo}</p> <hr style="border:1px dashed #000; margin:8px 0;">
             </div>
 
-            <div class="order-header">
+            <div class="order-header" style="align-items: flex-start;">
                 <span>Invoice No: <strong>#${order.invoiceNo}</strong></span>
-                <span>Token: <strong>${order.tokenNo}</strong></span>
+                <span style="display: flex; flex-direction: column;">
+                    <div>Token: <strong>${order.tokenNo}</strong> ${badgeHTML}</div>
+                </span>
                 <span>${date}</span>
                 <span class="badge ${order.paymentStatus === 'paid' ? 'badge-paid' : 'badge-pending'}">
                     ${order.paymentStatus.toUpperCase()}
@@ -164,7 +174,7 @@ async function deleteOrder(id) {
     try {
         // 2. Call your backend delete route
         const response = await fetch(`http://localhost:8000/api/order-delete/${id}`, {
-            method: "DELETE", // Or "POST" depending on your backend setup
+            method: "DELETE",
             headers: { "Content-Type": "application/json" }
         });
 
