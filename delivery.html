@@ -348,7 +348,7 @@
 
         try {
             // Sending to order-insert so it shows on the Billing Page
-            const res = await fetch('http://localhost:8000/api/order-insert', {
+            const res = await fetch('https://canteen-backend-jjya.onrender.com/api/order-insert', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify(orderData)

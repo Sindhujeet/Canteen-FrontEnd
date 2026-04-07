@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000/api/order-list";
+const API_URL = "https://canteen-backend-jjya.onrender.com/api/order-list";
 
 // ── Fetch all orders ────────────────────────────────────────────
 async function fetchOrders() {
@@ -121,7 +121,7 @@ function displayOrders(orders) {
 // ── Mark as Paid ────────────────────────────────────────────────
 async function markAsPaid(id) {
     try {
-        const response = await fetch(`http://localhost:8000/api/order-update/${id}`, {
+        const response = await fetch(`https://canteen-backend-jjya.onrender.com/api/order-update/${id}`, {
             method: "PUT",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ paymentStatus: "paid" })
@@ -173,7 +173,7 @@ async function deleteOrder(id) {
 
     try {
         // 2. Call your backend delete route
-        const response = await fetch(`http://localhost:8000/api/order-delete/${id}`, {
+        const response = await fetch(`https://canteen-backend-jjya.onrender.com/api/order-delete/${id}`, {
             method: "DELETE",
             headers: { "Content-Type": "application/json" }
         });

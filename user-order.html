@@ -248,7 +248,7 @@ body {
     </div>
 </div>
 <script>
-const API_URL = "http://localhost:8000/api/item-list";
+const API_URL = "https://canteen-backend-jjya.onrender.com/api/item-list";
 let menuItems = [];
 let cart = [];
 let currentOrderData = null;
@@ -375,7 +375,7 @@ async function placeOrder() {
     const btn = document.querySelector('.place-btn');
     btn.innerText = "Processing...";
     try {
-        let res = await fetch("http://localhost:8000/api/order-insert", {
+        let res = await fetch("https://canteen-backend-jjya.onrender.com/api/order-insert", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ 

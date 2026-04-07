@@ -178,7 +178,7 @@ async function handleLogin() {
     if(!user || !pass) return alert("Please enter both username and password.");
 
     try {
-        const res = await fetch("http://localhost:8000/api/login", {
+        const res = await fetch("https://canteen-backend-jjya.onrender.com/api/login", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: user, password: pass })
@@ -221,7 +221,7 @@ async function handleRegister() {
     if(!user || !pass) return alert("All fields are required.");
 
     try {
-        const res = await fetch("http://localhost:8000/api/register", {
+        const res = await fetch("https://canteen-backend-jjya.onrender.com/api/register", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ username: user, password: pass, role: role })

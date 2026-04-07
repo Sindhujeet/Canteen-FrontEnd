@@ -45,7 +45,7 @@ function logout(){
 async function loadLiveStats() {
     try {
         // 1. Fetch Sales & Orders
-        let salesRes = await fetch("http://localhost:8000/api/sales");
+        let salesRes = await fetch("https://canteen-backend-jjya.onrender.com/api/sales");
         let salesData = await salesRes.json();
         
         if (salesData.status === 1) {
@@ -54,7 +54,7 @@ async function loadLiveStats() {
         }
 
         // 2. Fetch Menu Items count
-        let itemsRes = await fetch("http://localhost:8000/api/item-list");
+        let itemsRes = await fetch("https://canteen-backend-jjya.onrender.com/api/item-list");
         let itemsData = await itemsRes.json();
         
         if (itemsData.status === 1) {
