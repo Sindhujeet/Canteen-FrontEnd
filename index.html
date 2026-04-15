@@ -471,11 +471,19 @@ function downloadReceiptPDF() {
     const element = document.getElementById('receiptContent');
     
     const opt = {
-        margin:       [0.5, 0.5],
+        margin:       0.2, // Smaller margin to fit everything nicely
         filename:     `GUS_Token_${currentOrderData.tokenNo}.pdf`,
         image:        { type: 'jpeg', quality: 0.98 },
-        html2canvas:  { scale: 3, backgroundColor: '#ffffff' },
-        jsPDF:        { unit: 'in', format: [4, 6], orientation: 'portrait' }
+        html2canvas:  { 
+            scale: 2, // Lowered from 3 to prevent mobile memory crashes (blank PDFs)
+            backgroundColor: '#ffffff',
+            scrollY: 0 // Forces it to capture from the top, fixing the blank scroll bug
+        },
+        jsPDF:        { 
+            unit: 'in', 
+            format: 'a5', // Standard A5 size handles lists of items much better than 4x6
+            orientation: 'portrait' 
+        }
     };
 
     html2pdf().set(opt).from(element).save();
