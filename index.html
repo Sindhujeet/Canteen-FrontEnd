@@ -3,304 +3,485 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Admin Menu</title>
+<title>GUS Canteen | Quick Order</title>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
 
 <style>
-body {
+/* ========================================= */
+/* --- 1. CORE THEME & LAYOUT -------------- */
+/* ========================================= */
+:root {
+    --primary: #ff4757; 
+    --primary-hover: #ff6b81;
+    --bg-color: #f8fafc; 
+    --card-bg: #ffffff;
+    --text-main: #2d3436;
+    --text-muted: #636e72;
+    --cart-width: 340px;
+}
+
+* {
+    box-sizing: border-box;
     margin: 0;
-    font-family: Arial;
-    background: rgb(6, 219, 165);
+    padding: 0;
 }
-.container {
-    width: 95%;
-    margin: auto;
-    padding: 30px;
+
+body {
+    background-color: var(--bg-color);
+    background-image: url("Background.jpeg"); 
+    background-size: cover; 
+    background-position: center; 
+    background-attachment: fixed; 
+    min-height: 100vh;
+    /* desktop space for the sidebar */
+    margin-right: var(--cart-width); 
+    font-family: 'Poppins', sans-serif;
+    color: var(--text-main);
 }
-.admin-panel {
-    background: rgb(121, 130, 214);
-    padding: 20px;
-    border-radius: 15px;
-    margin-bottom: 30px;
+
+/* ========================================= */
+/* --- 2. HEADER & LOGO (FIXED SIZE) ------- */
+/* ========================================= */
+.header {
+    background: var(--card-bg);
+    padding: 10px 30px;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    height: 80px; /* Locked header height */
 }
-input, select {
-    padding: 8px;
-    margin: 5px;
+
+.header-logo {
+    height: 60px !important; /* Forces logo to stay small */
+    width: auto !important;
+    object-fit: contain;
+    margin-right: 15px;
 }
-button {
-    padding: 8px 15px;
-    margin: 5px;
+
+.header h2 { 
+    font-size: 22px; 
+    font-weight: 700; 
+    color: var(--primary); 
+}
+
+/* ========================================= */
+/* --- 3. MENU & CATEGORIES ---------------- */
+/* ========================================= */
+.container { 
+    width: 92%; 
+    max-width: 1200px; 
+    margin: 20px auto; 
+}
+
+.category-grid { 
+    display: flex; 
+    flex-wrap: wrap; 
+    gap: 12px; 
+    margin-bottom: 25px; 
+}
+
+.category-card {
+    background: white; 
+    padding: 8px 20px; 
+    border-radius: 30px; 
+    box-shadow: 0 2px 8px rgba(0,0,0,0.04); 
+    font-size: 14px;
+    font-weight: 600; 
+    color: var(--text-muted); 
+    cursor: pointer;
+    border: 2px solid transparent; 
+    transition: 0.2s;
+}
+
+.category-card.active-cat { 
+    background: var(--primary); 
+    color: white; 
+}
+
+.menu-grid { 
+    display: grid; 
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); 
+    gap: 20px; 
+}
+
+.food-card {
+    background: var(--card-bg); 
+    border-radius: 12px; 
+    box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+    overflow: hidden; 
+    transition: 0.2s; 
+    display: flex; 
+    flex-direction: column;
+}
+
+.food-card img { 
+    width: 100%; 
+    height: 150px !important; /* Prevents image from becoming giant */
+    object-fit: cover; 
+    background: #f1f2f6; 
+}
+
+.food-body { padding: 15px; flex-grow: 1; }
+.food-body h3 { font-size: 16px; margin-bottom: 5px; }
+.food-body .desc { font-size: 12px; color: var(--text-muted); min-height: 35px; }
+
+.price-row { display: flex; justify-content: space-between; align-items: center; margin-top: 10px; }
+.price { font-size: 17px; font-weight: 700; }
+
+.add-btn {
+    padding: 6px 15px; 
+    border: none; 
+    background: #e8f5e9; 
+    color: #2ed573;
+    font-weight: 600; 
+    border-radius: 6px; 
     cursor: pointer;
 }
-.menu-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 15px;
+
+/* ========================================= */
+/* --- 4. CART SIDEBAR --------------------- */
+/* ========================================= */
+.cart-box {
+    position: fixed; 
+    right: 0; 
+    top: 0; 
+    bottom: 0; 
+    width: var(--cart-width);
+    background: var(--card-bg); 
+    border-left: 1px solid #eee; 
+    padding: 20px;
+    display: flex; 
+    flex-direction: column; 
+    z-index: 1000;
 }
-.card {
-    background: #b5cb0d;
-    padding: 10px;
-    border-radius: 10px;
+
+.cart-item { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 13px; }
+.qty-controls { display: flex; gap: 8px; align-items: center; }
+.qty-controls button { width: 22px; height: 22px; cursor: pointer; border: 1px solid #ddd; background: #fff; }
+
+.cart-footer { margin-top: auto; padding-top: 15px; border-top: 2px solid #eee; }
+.place-btn {
+    width: 100%; padding: 12px; background: var(--primary); color: white;
+    border: none; border-radius: 6px; cursor: pointer; font-weight: 600; margin-bottom: 8px;
 }
-.card img {
-    width: 100%;
-    height: 140px;
-    object-fit: cover;
+
+.delivery-btn {
+    width: 100%; padding: 12px; background: #28a745; color: white;
+    border: none; border-radius: 6px; cursor: pointer; font-weight: 600;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
 }
+
+/* ========================================= */
+/* --- 5. RESPONSIVE (MOBILE FIX) ---------- */
+/* ========================================= */
+@media (max-width: 900px) {
+    body { 
+        margin-right: 0; 
+        /* Adds space at the bottom so the last food item isn't hidden behind the cart */
+        padding-bottom: 250px; 
+    }
+    
+    .cart-box {
+        position: fixed;     /* Locks it to the screen */
+        top: auto;           /* Unsets top */
+        bottom: 0;           /* Sticks it to the bottom */
+        left: 0;
+        right: 0;
+        width: 100%; 
+        height: auto; 
+        max-height: 45vh;    /* Prevents it from covering more than 45% of the screen */
+        overflow-y: auto;    /* Allows scrolling inside the cart */
+        border-left: none; 
+        border-top: 4px solid var(--primary);
+        margin-top: 0;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
+    }
+
+    .menu-grid { 
+        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); 
+    }
+}
+
+/* ========================================= */
+/* --- 6. MODAL/RECEIPT -------------------- */
+/* ========================================= */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0, 0, 0, 0.6); display: none; justify-content: center; align-items: center; z-index: 2000;
+}
+.receipt-box { background: white; width: 90%; max-width: 350px; padding: 20px; border-radius: 10px; }
 </style>
 </head>
-
 <body>
 
+<div class="header">
+    <img src="https://gurucharanuniversity.ac.in/images/gcu_logo.png" alt="GUS Logo" class="header-logo">
+    <h2>GUS Canteen</h2>
+</div>
+
 <div class="container">
-
-<div class="admin-panel">
-<h2>Admin Panel</h2>
-
-<input id="name" placeholder="Item name">
-<input id="desc" placeholder="Description">
-<input id="price" type="number" placeholder="Price">
-<input id="quantity" type="number" placeholder="Quantity">
-
-<br>
-
-<input id="imageUrl" placeholder="Image URL">
-<input type="file" id="imageFile">
-
-<br>
-
-<input id="newCategory" placeholder="New Category">
-<button onclick="addCategory()">Add Category</button>
-
-<br><br>
-
-<select id="category"></select>
-
-<br><br>
-
-<button onclick="addItem()">Add / Update</button>
-
+    <div id="categorySection"></div>
+    <div id="itemSection" style="display:none;"></div>
 </div>
 
-<div class="menu-grid" id="menuContainer"></div>
-
+<div class="cart-box">
+    <h3>Your Cart</h3>
+    <div id="cartItems"></div>
+    <div class="cart-footer">
+        <div class="total" style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:15px;">
+            <span>Total:</span>
+            <span>₹<span id="total">0</span></span>
+        </div>
+        <select id="paymentMethod" style="width:100%; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #ddd;">
+            <option value="cash">Cash 💵</option>
+            <option value="upi">UPI 📱</option>
+        </select>
+        
+        <button class="place-btn" onclick="placeOrder()">Place Order (Pickup)</button>
+        
+        <button class="delivery-btn" onclick="proceedToTeacherDelivery()">
+            <i class="fas fa-truck"></i> Teacher's Delivery
+        </button>
+    </div>
 </div>
 
+<div id="receiptModal" class="modal-overlay">
+    <div class="receipt-box">
+        <div id="receiptContent"></div>
+        <button onclick="downloadReceiptPDF()" style="width:100%; padding:10px; background:#e11d48; color:white; border:none; border-radius:6px; margin-top:10px; cursor:pointer;">Download PDF</button>
+        <button onclick="closeReceipt()" style="width:100%; padding:10px; background:#374151; color:white; border:none; border-radius:6px; margin-top:5px; cursor:pointer;">Close</button>
+    </div>
+</div>
 <script>
+const API_URL = "https://canteen-backend-jjya.onrender.com/api/item-list";
+let menuItems = [];
+let cart = [];
+let currentOrderData = null;
 
-const API_URL = "http://localhost:8000";
-let menu = [];
-let editId = null;
-
-// FETCH MENU
+// 1. Fetch Menu from Backend
 async function fetchMenu() {
-    const res = await fetch(`${API_URL}/api/item-list`);
-    const data = await res.json();
-    menu = data.data;
-
-    loadCategories();
-    displayMenu(menu);
+    try {
+        const res = await fetch(API_URL);
+        const data = await res.json();
+        menuItems = data.data;
+        loadCategories();
+        openCategory('All');
+    } catch (err) {
+        console.error("Failed to fetch menu:", err);
+        document.getElementById("itemSection").innerHTML = "<p style='text-align:center; padding:20px;'>❌ Backend Not Connected</p>";
+    }
 }
 
-// LOAD CATEGORIES
+// 2. Load Categories Bar
 function loadCategories() {
-    let select = document.getElementById("category");
-    select.innerHTML = "";
-
-    let categories = [...new Set(menu.map(item => item.category).filter(c => c))];
-
+    const categories = [...new Set(menuItems.filter(i => i.available && i.quantity > 0 && i.category).map(i => i.category))];
+    let div = document.getElementById("categorySection");
+    let html = `<div class='category-grid'>
+                    <div class="category-card active-cat" id="cat-All" onclick="openCategory('All')">🍔 All Items</div>`;
     categories.forEach(cat => {
-        let option = document.createElement("option");
-        option.value = cat;
-        option.textContent = cat;
-        select.appendChild(option);
+        let cleanID = cat.replace(/\s+/g, '');
+        html += `<div class="category-card" id="cat-${cleanID}" onclick="openCategory('${cat}')">🍽️ ${cat}</div>`;
     });
+    div.innerHTML = html + `</div>`;
 }
 
-// ADD CATEGORY
-function addCategory() {
-    let newCat = document.getElementById("newCategory").value.trim();
-    if (!newCat) return;
+// 3. Open Specific Category
+function openCategory(cat) {
+    document.querySelectorAll('.category-card').forEach(el => el.classList.remove('active-cat'));
+    let cleanID = cat.replace(/\s+/g, '');
+    let activeBtn = document.getElementById(`cat-${cleanID}`);
+    if (activeBtn) activeBtn.classList.add('active-cat');
 
-    let select = document.getElementById("category");
+    let itemDiv = document.getElementById("itemSection");
+    itemDiv.style.display = "block";
+    
+    let items = (cat === 'All') 
+        ? menuItems.filter(i => i.available && i.quantity > 0) 
+        : menuItems.filter(i => i.category === cat && i.available && i.quantity > 0);
 
-    let exists = [...select.options].some(o => o.value === newCat);
-    if (exists) {
-        alert("Category already exists");
+    itemDiv.innerHTML = `<div class="menu-grid"></div>`;
+    let grid = itemDiv.querySelector(".menu-grid");
+    
+    if (items.length === 0) {
+        grid.innerHTML = "<p style='grid-column:1/-1; text-align:center;'>No items available.</p>";
         return;
     }
 
-    let option = document.createElement("option");
-    option.value = newCat;
-    option.textContent = newCat;
-
-    select.appendChild(option);
-    select.value = newCat;
-
-    document.getElementById("newCategory").value = "";
-}
-
-// DISPLAY MENU
-function displayMenu(items) {
-    let div = document.getElementById("menuContainer");
-    div.innerHTML = "";
-
     items.forEach(item => {
-
-        let stockText = "";
-        let stockColor = "green";
-
-        if (item.quantity === 0) {
-            stockText = "Out of Stock";
-            stockColor = "red";
-        } else if (item.quantity <= 5) {
-            stockText = `Low Stock (${item.quantity})`;
-            stockColor = "orange";
-        } else {
-            stockText = `In Stock (${item.quantity})`;
-        }
-
-        div.innerHTML += `
-        <div class="card">
-            <img src="${item.image || ''}">
-            <h3>${item.name}</h3>
-            <p>${item.description || ""}</p>
-            <p>₹${item.price}</p>
-
-            <p style="color:${stockColor}; font-weight:bold;">
-                ${stockText}
-            </p>
-
-            <p>Category: ${item.category || "—"}</p>
-
-            <label>
-                <input type="checkbox"
-                ${item.available ? "checked" : ""}
-                ${item.quantity === 0 ? "disabled" : ""}
-                onchange="toggleItem('${item._id}', this.checked)">
-                Available
-            </label>
-
-            <br><br>
-
-            <button onclick="editItem('${item._id}')">Edit</button>
-            <button onclick="deleteItem('${item._id}')">Delete</button>
+        let stockColor = item.quantity <= 5 ? '#ff9f43' : '#10ac84';
+        grid.innerHTML += `
+        <div class="food-card">
+            <img src="${item.image || ''}" onerror="this.src='https://via.placeholder.com/300x200?text=Food'">
+            <div class="food-body">
+                <h3>${item.name}</h3>
+                <p class="desc">${item.description || ""}</p>
+                <p style="font-size: 12px; color: ${stockColor}; margin: 0 0 10px 0; font-weight: 600;">
+                    ${item.quantity <= 5 ? `Only ${item.quantity} left` : "In Stock"}
+                </p>
+                <div class="price-row">
+                    <p class="price">₹${item.price}</p>
+                    <button class="add-btn" onclick="addToCart('${item._id}')">+ Add</button>
+                </div>
+            </div>
         </div>`;
     });
 }
 
-// TOGGLE AVAILABILITY
-async function toggleItem(id, available) {
-    let item = menu.find(m => m._id === id);
-
-    if (item.quantity === 0 && available === true) {
-        alert("Cannot enable item with 0 stock");
-        fetchMenu();
-        return;
+// 4. Cart Logic
+function addToCart(id) {
+    let item = menuItems.find(m => m._id === id);
+    let existing = cart.find(c => c._id === id);
+    if (existing) {
+        if (existing.qty >= item.quantity) return alert("Stock limit reached");
+        existing.qty++;
+    } else {
+        cart.push({ ...item, qty: 1 });
     }
+    updateCart();
+}
 
-    await fetch(`${API_URL}/api/item-update/${id}`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ available })
+function increaseQty(id) {
+    let item = cart.find(c => c._id === id);
+    let original = menuItems.find(m => m._id === id);
+    if (item.qty >= original.quantity) return alert("Max stock reached");
+    item.qty++;
+    updateCart();
+}
+
+function decreaseQty(id) {
+    let item = cart.find(c => c._id === id);
+    item.qty--;
+    if (item.qty <= 0) cart = cart.filter(c => c._id !== id);
+    updateCart();
+}
+
+function updateCart() {
+    let div = document.getElementById("cartItems");
+    div.innerHTML = "";
+    let total = 0;
+    cart.forEach(item => {
+        total += item.price * item.qty;
+        div.innerHTML += `
+        <div class="cart-item">
+            <span style="flex-grow:1; font-weight:600;">${item.name} <br><span style="color:#ff4757; font-size:13px;">₹${item.price}</span></span>
+            <div class="qty-controls">
+                <button onclick="decreaseQty('${item._id}')">-</button>
+                <span>${item.qty}</span>
+                <button onclick="increaseQty('${item._id}')">+</button>
+            </div>
+        </div>`;
     });
-
-    fetchMenu();
+    document.getElementById("total").innerText = total;
 }
 
-// ADD / UPDATE ITEM
-function addItem() {
-    let name = document.getElementById("name").value;
-    let desc = document.getElementById("desc").value;
-    let price = document.getElementById("price").value;
-    let quantity = document.getElementById("quantity").value;
-    let category = document.getElementById("category").value;
-    let imageUrl = document.getElementById("imageUrl").value;
-    let file = document.getElementById("imageFile").files[0];
-
-    if (!name || !price) {
-        alert("Name and price required");
-        return;
-    }
-
-    if (file) {
-        let reader = new FileReader();
-        reader.onload = function(e) {
-            saveItem(e.target.result, name, desc, price, quantity, category);
-        };
-        reader.readAsDataURL(file);
-    } else {
-        saveItem(imageUrl, name, desc, price, quantity, category);
-    }
-}
-
-// SAVE ITEM
-async function saveItem(image, name, desc, price, quantity, category) {
-
-    let payload = {
-        name,
-        description: desc,
-        price: Number(price),
-        quantity: Number(quantity),
-        image,
-        category,
-        available: Number(quantity) > 0
-    };
-
-    if (editId) {
-        await fetch(`${API_URL}/api/item-update/${editId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
-        });
-        editId = null;
-    } else {
-        await fetch(`${API_URL}/api/item-insert`, {
+// 5. Place Order & Bridge
+async function placeOrder() {
+    if (cart.length === 0) return alert("Cart is empty!");
+    const btn = document.querySelector('.place-btn');
+    btn.innerText = "Processing...";
+    try {
+        let res = await fetch("https://canteen-backend-jjya.onrender.com/api/order-insert", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(payload)
+            body: JSON.stringify({ 
+                items: cart.map(i => ({ itemId: i._id, name: i.name, price: i.price, quantity: i.qty })), 
+                paymentMethod: document.getElementById("paymentMethod").value 
+            })
         });
-    }
-
-    resetForm();
-    fetchMenu();
+        let result = await res.json();
+        if (result.status === 1) {
+            currentOrderData = result.data;
+            renderReceipt();
+            document.getElementById('receiptModal').style.display = 'flex';
+            cart = []; updateCart(); fetchMenu();
+        }
+    } catch (err) { alert("Order failed."); }
+    finally { btn.innerText = "Place Order (Pickup)"; }
 }
 
-// EDIT ITEM
-function editItem(id) {
-    let item = menu.find(m => m._id === id);
-
-    document.getElementById("name").value = item.name;
-    document.getElementById("desc").value = item.description;
-    document.getElementById("price").value = item.price;
-    document.getElementById("quantity").value = item.quantity;
-    document.getElementById("category").value = item.category;
-    document.getElementById("imageUrl").value = item.image;
-
-    editId = id;
+function proceedToTeacherDelivery() {
+    if (cart.length === 0) return alert("Your cart is empty!");
+    localStorage.removeItem("cart");
+    localStorage.setItem("cart", JSON.stringify(cart));
+    window.location.href = "delivery.html";
 }
 
-// DELETE ITEM
-async function deleteItem(id) {
-    await fetch(`${API_URL}/api/item-delete/${id}`, {
-        method: "DELETE"
-    });
-    fetchMenu();
+// 6. Receipt Modal Logic
+function renderReceipt() {
+    let itemsHtml = currentOrderData.items.map(item => `
+        <tr style="font-size: 13px; color: #333;">
+            <td style="padding: 5px 0;">${item.name}</td>
+            <td style="text-align: center; padding: 5px 0;">${item.quantity}</td>
+            <td style="text-align: center; padding: 5px 0;">Rs.${item.price}</td>
+            <td style="text-align: right; padding: 5px 0;">Rs.${item.price * item.quantity}</td>
+        </tr>
+    `).join('');
+
+    document.getElementById('receiptContent').innerHTML = `
+        <div style="text-align: center; font-family: Arial, sans-serif; color: #333; padding: 10px;">
+            <h2 style="color: #e11d48; margin-bottom: 5px; font-size: 22px;">GUS Canteen</h2>
+            <p style="font-size: 12px; margin: 0; color: #666;">Official Receipt</p>
+            
+            <hr style="border: none; border-top: 1px solid #ccc; margin: 15px 0;">
+            <h3 style="font-size: 20px; font-weight: bold; margin: 10px 0; color: #e11d48;">Token No: ${currentOrderData.tokenNo}</h3>
+            <hr style="border: none; border-top: 1px solid #ccc; margin: 15px 0;">
+
+            <div style="text-align: left; font-size: 12px; line-height: 1.6; margin-bottom: 15px;">
+                <div>Invoice No: #${currentOrderData.invoiceNo}</div>
+                <div>Date: ${new Date().toLocaleString('en-IN')}</div>
+                <div>Payment: ${currentOrderData.paymentMethod.toUpperCase()}</div>
+            </div>
+
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 10px;">
+                <thead>
+                    <tr style="font-size: 13px; border-bottom: 1px solid #333; font-weight: bold;">
+                        <th style="text-align: left; padding-bottom: 5px;">Item</th>
+                        <th style="text-align: center; padding-bottom: 5px;">Qty</th>
+                        <th style="text-align: center; padding-bottom: 5px;">Price</th>
+                        <th style="text-align: right; padding-bottom: 5px;">Subtotal</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${itemsHtml}
+                </tbody>
+            </table>
+
+            <hr style="border: none; border-top: 1px solid #333; margin: 10px 0;">
+            <div style="display: flex; justify-content: flex-end; font-size: 16px; font-weight: bold;">
+                <span>Total: Rs.${currentOrderData.total}</span>
+            </div>
+
+            <div style="margin-top: 30px; font-size: 11px; color: #888;">
+                Thank you for dining with us!<br>GUS Canteen
+            </div>
+        </div>
+    `;
 }
 
-// RESET FORM
-function resetForm() {
-    document.getElementById("name").value = "";
-    document.getElementById("desc").value = "";
-    document.getElementById("price").value = "";
-    document.getElementById("quantity").value = "";
-    document.getElementById("imageUrl").value = "";
-    document.getElementById("newCategory").value = "";
-}
+function closeReceipt() { document.getElementById('receiptModal').style.display = 'none'; }
+function downloadReceiptPDF() {
+    if (!currentOrderData) return;
 
-// INIT
+    const element = document.getElementById('receiptContent');
+    
+    const opt = {
+        margin:       [0.5, 0.5],
+        filename:     `GUS_Token_${currentOrderData.tokenNo}.pdf`,
+        image:        { type: 'jpeg', quality: 0.98 },
+        html2canvas:  { scale: 3, backgroundColor: '#ffffff' },
+        jsPDF:        { unit: 'in', format: [4, 6], orientation: 'portrait' }
+    };
+
+    html2pdf().set(opt).from(element).save();
+}
+// Initialize
 fetchMenu();
-
 </script>
-
 </body>
 </html>
