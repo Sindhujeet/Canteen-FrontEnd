@@ -181,15 +181,26 @@ body {
 /* --- 5. RESPONSIVE (MOBILE FIX) ---------- */
 /* ========================================= */
 @media (max-width: 900px) {
-    body { margin-right: 0; }
+    body { 
+        margin-right: 0; 
+        /* Adds space at the bottom so the last food item isn't hidden behind the cart */
+        padding-bottom: 250px; 
+    }
     
     .cart-box {
-        position: relative; 
+        position: fixed;     /* Locks it to the screen */
+        top: auto;           /* Unsets top */
+        bottom: 0;           /* Sticks it to the bottom */
+        left: 0;
+        right: 0;
         width: 100%; 
         height: auto; 
+        max-height: 45vh;    /* Prevents it from covering more than 45% of the screen */
+        overflow-y: auto;    /* Allows scrolling inside the cart */
         border-left: none; 
         border-top: 4px solid var(--primary);
-        margin-top: 40px;
+        margin-top: 0;
+        box-shadow: 0 -5px 15px rgba(0,0,0,0.1);
     }
 
     .menu-grid { 

@@ -38,7 +38,6 @@
             padding: 40px 0;
         }
 
-        /* Visibility Fix for Section Titles */
         .section-title {
             text-align: center;
             color: #ffffff;
@@ -50,7 +49,6 @@
             text-shadow: 0 4px 12px rgba(0,0,0,0.5), 0 0 20px rgba(99, 102, 241, 0.4);
         }
 
-        /* Admin Panel Card */
         .admin-panel {
             background: var(--glass-bg);
             backdrop-filter: blur(15px);
@@ -104,7 +102,6 @@
         }
         .btn-primary:hover { transform: translateY(-2px); background: #4338ca; }
 
-        /* Category Filter Buttons */
         .category-buttons {
             display: flex;
             justify-content: center;
@@ -134,7 +131,6 @@
             box-shadow: 0 0 15px rgba(99, 102, 241, 0.6);
         }
 
-        /* Menu Grid & Cards */
         .menu-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
@@ -181,7 +177,12 @@
                     <input id="newCategory" placeholder="Add Category" style="width:100px;">
                     <button class="btn-primary" onclick="addCategory()" style="padding:5px 15px;">+</button>
                 </div>
-                <select id="category"></select>
+                
+                <div style="display:flex; gap:5px; align-items:center; width:100%;">
+                    <select id="category" style="width:100%;"></select>
+                    <button class="btn-primary" onclick="deleteCategory()" style="background: var(--danger); padding:5px 15px; margin:0;" title="Delete Selected Category">🗑️</button>
+                </div>
+
                 <label style="font-weight:600; display:flex; align-items:center; gap:5px;">
                     <input type="checkbox" id="isSpecial"> ⭐ Special
                 </label>
@@ -197,7 +198,6 @@
     </div>
 
 <script>
-// Pointing directly to your live Render backend
 const API_URL = "https://canteen-backend-jjya.onrender.com/api";
 let menu = [];
 let editId = null;
@@ -234,6 +234,23 @@ function addCategory(){
     categories.push(newCat); saveCategories(); loadCategories();
 }
 
+// --- New Delete Category Logic ---
+function deleteCategory() {
+    let select = document.getElementById("category");
+    let catToDelete = select.value;
+    
+    if (!catToDelete) return;
+    if (!confirm(`Are you sure you want to delete the "${catToDelete}" category?`)) return;
+    
+    // Remove the category from the array
+    categories = categories.filter(c => c !== catToDelete);
+    
+    // Save to localStorage and refresh the dropdown
+    saveCategories(); 
+    loadCategories();
+}
+// ---------------------------------
+
 async function fetchMenu() {
     try {
         const res = await fetch(`${API_URL}/item-list`);
@@ -247,11 +264,9 @@ function displayMenu(items){
     div.innerHTML="";
     items.forEach(item=>{
         
-        // --- Added Smart Stock Logic ---
         let stockQty = item.quantity || 0;
         let stockText = stockQty === 0 ? "Out of Stock" : `Stock: ${stockQty}`;
         let stockColor = stockQty === 0 ? "var(--danger)" : (stockQty <= 5 ? "orange" : "var(--success)");
-        // -------------------------------
 
         div.innerHTML+=`
         <div class="card">
@@ -344,10 +359,7 @@ async function deleteItem(id){
     fetchMenu();
 }
 
-// Fetch Navbar
 fetch("navbar.html").then(r => r.text()).then(d => document.getElementById("navbar-container").innerHTML = d);
-
-// Initialize Page
 loadCategories();
 fetchMenu();
 </script>
